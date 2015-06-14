@@ -1,0 +1,76 @@
+/* Source: https://gist.github.com/inky/187274 */
+body {
+  background: #fff;
+  color: #000;
+  font: 300 1em/1.5 'Helvetica Neue', 'Helvetica', sans-serif;
+  margin: 3em 0 3em 2em;
+}
+h1, h2 {
+  font-family: 'Gill Sans', 'Helvetica Neue', 'Helvetica', sans-serif;
+  text-transform: uppercase;
+}
+h1 {
+  font-size: 1.2em;
+  line-height: 1.25;
+  margin: 0 0 2.5em;
+}
+h2 {
+  color: #444;
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0 0 1.5em;
+}
+.group {
+  float: left;
+  margin: 0 2em 3em 0;
+  width: 18em;
+}
+ol {
+  color: #bbb;
+  list-style-type: katakana;
+  margin: 0 0 0 2em;
+  padding: 0;
+}
+ol li {
+  padding-left: 1em;
+  text-indent: -1em;
+}
+a {
+  -webkit-transition:
+    color 0.25s ease-out,
+    border 0.25s ease-out;
+}
+#body a:link, #body a:visited {
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #bbb;
+  border-left: 0 solid #fff;
+  border-right: 1em solid #fff;
+}
+#body a:hover, #body a:active {
+  color: #444;
+  border-right-width: 0;
+  border-left-width: 1em;
+  border-bottom-color: #444;
+}
+#body .updated a:link, #body .updated a:visited {
+  color: #d00;
+}
+#body .updated a:hover, #body .updated a:active {
+  color: #444;
+}
+h1 a {
+  font-weight: 400 !important;
+  border-bottom-width: 0 !important;
+}
+.meta {
+  color: #888;
+  font-size: 0.9em;
+  line-height: 1;
+  margin-left: 0.5em;
+}
+.clear {
+  clear: both;
+}

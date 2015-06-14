@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>start.iopen</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" type="text/css" id="stylesheet">
+  <style id="defaultStyle">
+    body{background:#fff;font-family:Helvetica,Helvetica,Arial,sans-serif;margin:0}.theGroups{clear:both}.belowSpace{clear:both;height:20px}.theGroups .group{width:200px;margin:50px 0 0 90px;display:inline-block;float:left!important}.theGroups .group .title{width:185px;padding:0 0 6px 15px;border-bottom:1px solid #bcbcbc}.theGroups .group .title a{font-size:24px;text-decoration:none;color:#000}.theGroups .group .theLinks{line-height:16pt;font-size:13px;margin-top:5px;margin-left:2px;color:#000}.theGroups .group .theLinks .notUpdated{padding:2px 0 0 17px}.theGroups .group .theLinks .notUpdated a{text-decoration:none;color:#000}.theGroups .group .theLinks .notUpdated a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div id="start.open-contents"></div>
+  <div id="start.open-controls" style="position: absolute; left: 30px; top: 0px; z-index: 100000;">
+    <button id="all-groups" onclick="window.location.hash='#'">All Groups</button>
+  </div>
+
+  <script type="text/javascript">
+    var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
+    var themesReset = ["Edition", "Errand"];
+    var myTheme = localStorage.getItem("start.iopen:theme") || "Default";
+  </script>
+
+  <script type="text/html" id="Default">
+    <div class="theGroups">
+      <% for ( var groupName in groups ) { %>
+        <% links = groups[groupName]; %>
+        <div class="group" id="<%=groupName%>">
+          <div class="title">
+            <a href="#<%=groupName%>">
+              <%=groupName%>
+            </a>
+          </div>
+          <div class="theLinks">
+            <% for ( var linkName in links ) { %>
+              <div class="notUpdated">
+                <a href="<%=links[linkName]%>">
+                  <%=linkName%>
+                </a>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+      <div class="belowSpace"></div>
+    </div>
+  </script>
+
+  <script type="text/html" id="Mobile">
+    <% for ( var groupName in groups ) { %>
+      <% links = groups[groupName]; %>
+      <div class="group" id="<%=groupName%>">
+        <h2><a href="#<%=groupName%>" target="_self"><%=groupName%></a></h2>
+        <% for ( var linkName in links ) { %>
+          <a href="<%=links[linkName]%>"><%=linkName%></a><br />
+        <% } %>
+      </div>
+    <% } %>
+  </script>
+
+  <script type="text/javascript">
+    // Simple JavaScript Templating
+    // John Resig - http://ejohn.org/ - MIT Licensed
+    (function(){var cache={};this.tmpl=function tmpl(str,data){var fn=!/\W/.test(str)?cache[str]=cache[str]||tmpl(document.getElementById(str).innerHTML):new Function("obj","var p=[],print=function(){p.push.apply(p,arguments);};"+"with(obj){p.push('"+str.replace(/[\r\t\n]/g," ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g,"$1\r").replace(/\t=(.*?)%>/g,"',$1,'").split("\t").join("');").split("%>").join("p.push('").split("\r").join("\\'")+"');}return p.join('');");return data?fn(data):fn}})();
+  </script>
+  <script type="text/javascript" src="lib/iCookie.js"></script>
+
+  <script type="text/javascript">
+    function load(file, mimetype, callback) {
+      var xobj = new XMLHttpRequest();
+      xobj.overrideMimeType(mimetype);
+      xobj.open('GET', file, true);
+      xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4) {
+          if(xobj.status == "200" || xobj.status == "0")
+            callback(xobj.responseText);
+          else
+            alert(xobj.responseText);
+        }
+      };
+      xobj.send(null);
+    };
+    function isMobile() {
+      if(localStorage.getItem("start.iopen:mobile")===true) return true;
+      try{ document.createEvent("TouchEvent"); return true; }
+      catch(e){ return false; }
+    }
+
+    window.onhashchange = showGroup;
+    function showGroup() {
+      var groupName = location.hash.replace(/^#/, '');
+      var group = document.getElementById(groupName);
+      var groupDivs = document.getElementsByClassName("group");
+      [].forEach.call(groupDivs, function(groupDiv) {
+        groupDiv.style.display = (group == groupDiv || group===null) ? "" : "none";
+      });
+      document.getElementById("all-groups").style.display = group==null ? "none" : "";
+    }
+
+    localStorage.setItem("start.iopen:mobile", false);
+  </script>
+
+  <script type="text/javascript">
+    var style = document.getElementById("defaultStyle");
+    if(isMobile()) {
+      style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
+      document.getElementById("start.open-controls").style.cssText = "";
+      document.getElementById("start.open-controls").insertBefore(document.createElement("br"), document.getElementById("all-groups"));
+      myTheme = "Mobile";
+    } else {
+      ///// Set up the Skin Selector /////
+      var themeselector = document.createElement("select");
+      themes.forEach(function(theme) {
+        var themeOpt = document.createElement("option");
+        themeOpt.textContent = theme;
+        if(theme==myTheme) themeOpt.selected = 'selected';
+        themeselector.appendChild(themeOpt);
+      });
+      themeselector.onchange = function() {
+        localStorage.setItem("start.iopen:theme", this.value);
+        location.reload();
+      };
+      var controls = document.getElementById("start.open-controls");
+      controls.insertBefore(themeselector, controls.firstChild);
+
+      ///// Load the CSS /////
+      if(myTheme!="Default") {
+        var stylesheet = document.getElementById("stylesheet");
+        if(themesReset.indexOf(myTheme)>0) {
+          var reset = stylesheet.cloneNode();
+          reset.href = "themes/reset.css";
+          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+        }
+        stylesheet.href = "themes/" + myTheme + ".css";
+        style.parentElement.removeChild(style); //remove Default's CSS
+      }
+    }
+
+    ///// Load the JSON /////
+    var doLoad = function() {
+      load("sites.json", "application/json", function(jsonData) {
+        window.jsonData = jsonData; //TODO: Needed???
+        document.getElementById("start.open-contents").innerHTML = tmpl(myTheme, {groups: JSON.parse(jsonData)});
+        showGroup();
+      });
+    };
+
+    if(document.getElementById(myTheme)) {
+      console.log("Skin is inlined: ", myTheme);
+      doLoad();
+    }
+    else 
+      load("themes/" + myTheme + ".templ", "text/html", function(data) {
+        var template = document.getElementById("Default");
+        template.innerHTML = data;
+        template.id = myTheme
+        doLoad();
+      });
+  </script>
+
+</body>
+</html>
