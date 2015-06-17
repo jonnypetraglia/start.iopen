@@ -8,17 +8,215 @@
   <style id="defaultStyle">
     body{background:#fff;font-family:Helvetica,Helvetica,Arial,sans-serif;margin:0}.theGroups{clear:both}.belowSpace{clear:both;height:20px}.theGroups .group{width:200px;margin:50px 0 0 90px;display:inline-block;float:left!important}.theGroups .group .title{width:185px;padding:0 0 6px 15px;border-bottom:1px solid #bcbcbc}.theGroups .group .title a{font-size:24px;text-decoration:none;color:#000}.theGroups .group .theLinks{line-height:16pt;font-size:13px;margin-top:5px;margin-left:2px;color:#000}.theGroups .group .theLinks .notUpdated{padding:2px 0 0 17px}.theGroups .group .theLinks .notUpdated a{text-decoration:none;color:#000}.theGroups .group .theLinks .notUpdated a:hover{text-decoration:underline}
   </style>
+  <!-- Popup -->
+  <style>
+      .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 500ms;
+        visibility: hidden;
+        opacity: 0;
+      }
+      .overlay.shown {
+        visibility: visible;
+        opacity: 1;
+      }
+      .popup p {
+        margin: 2em auto;
+      }
+      .popup {
+        margin: 2em auto;
+        padding: 0.5em 1.5em 1.5em 1.5em;
+        background: #fff;
+        border-radius: 0.5em;
+        width: 25em;
+        max-width: 100%;
+        position: relative;
+        transition: all 5s ease-in-out;
+        font: normal 1em sans-serif;
+        z-index: 1000;
+      }
+      .popup .buttons {
+          text-align:right;
+      }
+      .popup .buttons a {
+          background: #75B4D2;
+          border-radius: 1em;
+          padding: 0.5em 1em;
+          color: white;
+          cursor: pointer;
+      }
+      .popup .buttons a:hover {
+          background: #5d90a8;
+      }
+      .popup .popupTitle {
+        font: normal 1.5em sans-serif;
+        margin: 0;
+      }
+  </style>
+  <!-- Menu on the left -->
+  <style>
+      .menu {
+        top: 0;
+        left: 2em;
+        position: absolute;
+        z-index: 9999999;
+        color: #464646;
+      }
+      .menu {
+        display: inline-block;
+        font: bold 1em/0.5em sans-serif;
+      }
+      .menu label,
+      .menu ul li,
+      .menu span {
+        border-left: #aaa 1px solid;
+        border-right: #aaa 1px solid;
+        background: #F6F6F6;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+      }
+      .menu label {
+        color: black;
+        padding: 0.5em 1em;
+        display: inline-block;
+        cursor: pointer;
+        display: block;
+        text-align: center;
+      }
+      .menu > div:hover ul,
+      .menu input[type=checkbox]:checked ~ ul {
+        display: block;
+      }
+      .menu ul {
+        font: normal 0.75em/1.6em sans-serif;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: none;
+        text-align: center;
+      }
+      .menu ul li:hover {
+        background: #75B4D2;
+        color: white;
+        cursor: pointer;
+      }
+      .menu ul li,
+      .menu span {
+        border-top: #E7E7E7 1px solid;
+      }
+      .menu span {
+        height: 0.5em;
+        padding: 0;
+        border-bottom: #aaa 1px solid;
+        border-bottom-left-radius: 1em;
+        border-bottom-right-radius: 1em;
+        display: block;
+        cursor: default;
+      }
+      #menu-cbox {
+        display: none;
+      }
+  </style>
 </head>
 <body>
   <div id="start.open-contents"></div>
-  <div id="start.open-controls" style="position: absolute; left: 30px; top: 0px; z-index: 100000;">
-    <button id="all-groups" onclick="window.location.hash='#'">All Groups</button>
+  <nav class="menu" onload="alert('hi'); this.checked = false">
+    <div>
+      <input type="checkbox" id="menu-cbox" disabled >
+      <script type="text/javascript">
+        document.getElementById("menu-cbox").checked = false;
+      </script>
+      <label for="menu-cbox">start.iopen</label>
+      <ul>
+        <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
+        <li onclick="document.getElementById('preferencePopup').className += ' shown'">Preferences</li>
+        <li>About</li>
+      </ul>
+      <span>&nbsp;</span>
+    </div>
+  </nav>
+  <div id="preferencePopup" class="overlay">
+      <div class="popup">
+          <div class="popupTitle">Preferences</div>
+          <form class="content" id="preferenceForm">
+              <p>
+                 <label for="jsonPath">Sites JSON path:
+                   <input name="jsonPath" id="start.iopen:jsonPath" type="text" style="width: 35em"> 
+                 </label>
+              </p>
+              <p>
+                  <input name="newWindow" id="start.iopen:newWindow" type="checkbox">
+                  <label for="newWindow">Open links in new window</label>
+              </p>
+              <p>
+                  <label for="theme">Theme</label>
+                  <select id="start.iopen:theme" name="theme"></select>
+              </p>
+              <p>
+                  Force layout:
+                  <label>
+                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_auto" value="auto">
+                      Auto-detect
+                  </label>
+                  <label>
+                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_desktop"value="desktop">
+                      Desktop
+                  </label>
+                  <label>
+                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_mobile" value="mobile">
+                      Mobile
+                  </label>
+              </p>
+              <p>
+                <label for="autofetch">Auto-fetch every (days):</label>
+                <input type="number" name="autofetch" value="7" style="width: 4em;" />
+              </p>
+          </form>
+          <br />
+          <div class="buttons">
+              <a onclick="savePrefs()">Save</a>
+              <a onclick="document.getElementById('preferencePopup').className = 'overlay';">Cancel</a>
+          </div>
+      </div>
   </div>
 
   <script type="text/javascript">
     var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
     var themesReset = ["Edition", "Errand"];
-    var myTheme = localStorage.getItem("start.iopen:theme") || "Default";
+
+
+    var Prefs = {
+      jsonPath: localStorage.getItem("start.iopen:jsonPath") || "sites.json",
+      theme: localStorage.getItem("start.iopen:theme") || "Default",
+      newWindow: localStorage.getItem("start.iopen:newWindow") !== false,
+      forceLayout: localStorage.getItem("start.iopen:forceLayout") || "auto"
+    };
+    document.getElementById("start.iopen:jsonPath").value = Prefs.jsonPath;
+    document.getElementById("start.iopen:newWindow").checked = Prefs.newWindow;
+    document.getElementById("start.iopen:forceLayout_auto").checked = Prefs.forceLayout=="auto";
+    document.getElementById("start.iopen:forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
+    document.getElementById("start.iopen:forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
+
+    function savePrefs() {
+      localStorage.setItem("start.iopen:jsonPath", document.getElementById("start.iopen:jsonPath").value)
+      localStorage.setItem("start.iopen:theme", document.getElementById("start.iopen:theme").value)
+      localStorage.setItem("start.iopen:newWindow", document.getElementById("start.iopen:newWindow").checked)
+      var force = "auto";
+      if(document.getElementById("start.iopen:forceLayout_desktop").checked)
+        force = "desktop"
+      else if(document.getElementById("start.iopen:forceLayout_mobile").checked)
+        force = "mobile"
+      localStorage.setItem("start.iopen:forceLayout", force)
+      location.reload()
+    }
   </script>
 
   <script type="text/html" id="Default">
@@ -81,7 +279,7 @@
       xobj.send(null);
     };
     function isMobile() {
-      if(localStorage.getItem("start.iopen:mobile")===true) return true;
+      if(Prefs.forceLayout == "mobile") return true;
       try{ document.createEvent("TouchEvent"); return true; }
       catch(e){ return false; }
     }
@@ -94,67 +292,70 @@
       [].forEach.call(groupDivs, function(groupDiv) {
         groupDiv.style.display = (group == groupDiv || group===null) ? "" : "none";
       });
-      document.getElementById("all-groups").style.display = group==null ? "none" : "";
+    
     }
-
-    localStorage.setItem("start.iopen:mobile", false);
   </script>
 
   <script type="text/javascript">
     var style = document.getElementById("defaultStyle");
     if(isMobile()) {
       style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
-      document.getElementById("start.open-controls").style.cssText = "";
-      document.getElementById("start.open-controls").insertBefore(document.createElement("br"), document.getElementById("all-groups"));
-      myTheme = "Mobile";
+      Prefs.theme = "Mobile";
     } else {
       ///// Set up the Skin Selector /////
-      var themeselector = document.createElement("select");
+      var themeselector = document.getElementById("start.iopen:theme"); //document.createElement("select");
       themes.forEach(function(theme) {
         var themeOpt = document.createElement("option");
         themeOpt.textContent = theme;
-        if(theme==myTheme) themeOpt.selected = 'selected';
+        if(theme==Prefs.theme) themeOpt.selected = 'selected';
         themeselector.appendChild(themeOpt);
       });
-      themeselector.onchange = function() {
-        localStorage.setItem("start.iopen:theme", this.value);
-        location.reload();
-      };
-      var controls = document.getElementById("start.open-controls");
-      controls.insertBefore(themeselector, controls.firstChild);
 
       ///// Load the CSS /////
-      if(myTheme!="Default") {
+      if(Prefs.theme!="Default") {
         var stylesheet = document.getElementById("stylesheet");
-        if(themesReset.indexOf(myTheme)>0) {
+        if(themesReset.indexOf(Prefs.theme)>0) {
           var reset = stylesheet.cloneNode();
           reset.href = "themes/reset.css";
           document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
         }
-        stylesheet.href = "themes/" + myTheme + ".css";
+        stylesheet.href = "themes/" + Prefs.theme + ".css";
         style.parentElement.removeChild(style); //remove Default's CSS
       }
     }
 
-    ///// Load the JSON /////
-    var doLoad = function() {
-      load("sites.json", "application/json", function(jsonData) {
-        window.jsonData = jsonData; //TODO: Needed???
-        document.getElementById("start.open-contents").innerHTML = tmpl(myTheme, {groups: JSON.parse(jsonData)});
-        showGroup();
-      });
+    var loadContents = function(jsonData) {
+      console.log("Loaded elements", jsonData)
+      document.getElementById("start.open-contents").innerHTML = tmpl(Prefs.theme, {groups: JSON.parse(jsonData)});
+      showGroup();
     };
 
-    if(document.getElementById(myTheme)) {
-      console.log("Skin is inlined: ", myTheme);
-      doLoad();
+    ///// Load the JSON /////
+    var fetchSites = function(force) {
+      var jsonData = localStorage.getItem("start.iopen:sites");
+      console.log(force)
+      if(jsonData!==null && !force)
+        loadContents(jsonData);
+      else {
+        load(Prefs.jsonPath,
+             "application/json",
+             function(jsonData) {
+          localStorage.setItem("sites", jsonData);
+          if(!force) //Going to refresh the page anyway
+            loadContents(jsonData);
+        });
+      }
+    };
+
+    if(document.getElementById(Prefs.theme)) {
+      fetchSites();
     }
     else 
-      load("themes/" + myTheme + ".templ", "text/html", function(data) {
+      load("themes/" + Prefs.theme + ".templ", "text/html", function(data) {
         var template = document.getElementById("Default");
         template.innerHTML = data;
-        template.id = myTheme
-        doLoad();
+        template.id = Prefs.theme
+        fetchSites();
       });
   </script>
 

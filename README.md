@@ -60,17 +60,17 @@ in the same lcoal directory.
 
 Thus there are two solutions:
 
-#### 1. Find a browser-specific workaround
+  #### 1. Find a browser-specific workaround
 
-For Chrome, it would be launching it with the parameter
-`--allow-file-access-from-files`, which admittedly does lessen security overall.
+  For Chrome, it would be launching it with the parameter
+  `--allow-file-access-from-files`, which admittedly does lessen security overall.
 
-#### 2. Make the JSON "JSON-esque"
+ #### 2. Make the JSON "JSON-esque"
 
-Adding the line:
-```jsonData=```
-to your sites JSON file will then let start.iopen read it as though it were JS,
-making Chrome Happy.
+  Adding the line:
+    ```jsonData=```
+  to your sites JSON file will then let start.iopen read it as though it were JS,
+  making Chrome Happy.
 
 ### Themes ###
 
@@ -86,7 +86,6 @@ want into `index.html` inside a `<script>` tag like so:
 There are already two templates for "Default" and "Mobile" that work along this
 practice.
 
- 
 
 ## Things lacking from start.io ##
 
