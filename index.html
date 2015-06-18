@@ -22,10 +22,7 @@
         transition: opacity 500ms;
         visibility: hidden;
         opacity: 0;
-      }
-      .overlay.shown {
-        visibility: visible;
-        opacity: 1;
+        z-index: 9999999;
       }
       .popup p {
         margin: 2em auto;
@@ -40,7 +37,6 @@
         position: relative;
         transition: all 3s ease-in-out;
         font: normal 1em sans-serif;
-        z-index: 100000;
       }
       .popup .buttons {
           text-align:right;
@@ -67,7 +63,7 @@
         top: 0;
         left: 2em;
         position: absolute;
-        z-index: 9999999;
+        z-index: 9999998;
         color: #464646;
       }
       .menu {
@@ -140,9 +136,54 @@
         cursor: default;
       }
   </style>
+  <!-- Spinner from https://twitter.com/veganben/status/415373812360679425 -->
+  <style>
+    .loading {
+      height: 0;
+      width: 0;
+      padding: 15px;
+      border: 6px solid #ccc;
+      border-right-color: #888;
+      border-radius: 22px;
+      -webkit-animation: rotate 1s infinite linear;
+      animation: rotate 1s infinite linear;
+      position: absolute;
+      left: 50%;
+      top: 35%;
+    }
+    @-webkit-keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    .shown {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+  <style>
+    .empty {
+      margin: 2em auto;
+      width: 100%;
+      text-align: center;
+      font-size: 2.5em;
+      color: #bbb;
+      text-shadow: -1px -1px #999;
+    }
+    .empty:before {
+      content: "!";
+      color: #666;
+      text-shadow: -1px -1px #444;
+    }
+  </style>
 </head>
 <body>
-  <div id="startiopen_contents"></div>
+  <div id="startiopen_container"></div>
   <nav class="menu" onload="alert('hi'); this.checked = false">
     <div>
       <input type="checkbox" id="startio_menucbox" disabled style="display: none;">
@@ -205,6 +246,10 @@
                   <button onclick="document.getElementById('startio_preferencePopup').className = 'overlay'; return false;">Cancel</button>
               </div>
           </form>
+          <p>
+            Debug:
+            <button onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
+          </p>
       </div>
   </div>
   <div id="startio_aboutPopup" class="overlay">
@@ -269,6 +314,10 @@
     <% } %>
   </script>
 
+  <script type="text/html" id="startiopen_empty">
+    <div class="empty"><%=message%></div>
+  </script>
+
   <script type="text/javascript">
     var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
     var themesReset = ["Edition", "Errand"];
@@ -277,10 +326,10 @@
     var Prefs = {
       jsonPath: localStorage.getItem("startiopen_jsonPath") || "sites.json",
       theme: localStorage.getItem("startiopen_theme") || "Default",
-      newWindow: localStorage.getItem("startiopen_newWindow") !== false,
+      newWindow: localStorage.getItem("startiopen_newWindow") !== "false",
       forceLayout: localStorage.getItem("startiopen_forceLayout") || "auto",
       autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7),
-      jsonIsh: localStorage.getItem("startiopen_jsonIsh")
+      jsonIsh: localStorage.getItem("startiopen_jsonIsh") == "true"
     };
     document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
     document.getElementById("startiopen_newWindow").checked = Prefs.newWindow;
@@ -313,19 +362,20 @@
   </script>
 
   <script type="text/javascript">
+    var Container = document.getElementById("startiopen_container");
     function load(file, mimetype, callback) {
+      Container.innerHTML = "<div class='loading'></div>";
       var xobj = new XMLHttpRequest();
       xobj.overrideMimeType(mimetype);
       xobj.open('GET', file, true);
       xobj.onreadystatechange = function () {
         if (xobj.readyState == 4) {
-          if(xobj.status == "200" || xobj.status == "0")
-            callback(xobj.responseText);
+          if(xobj.status == "200")
+            callback(null, xobj.responseText);
           else
-            alert(xobj.responseText);
+            callback(xobj.status == "0" ? "CORS request not allowed" : "AJAX failed: " + xobj.status + " " + xobj.statusText);
         }
       };
-      throw "NO"
       xobj.send(null);
     };
     function isMobile() {
@@ -340,12 +390,13 @@
     window.onhashchange = showGroup;
     function showGroup() {
       var groupName = location.hash.replace(/^#/, '');
-      var group = document.getElementById(groupName);
+      var group = groupName.length ? document.getElementById(groupName) : null;
+      if(groupName.length && !group)
+        return setEmpty("No group named '" + groupName + "'");
       var groupDivs = document.getElementsByClassName("group");
       [].forEach.call(groupDivs, function(groupDiv) {
         groupDiv.style.display = (group == groupDiv || group===null) ? "" : "none";
       });
-    
     }
 
     ///// Set up the Skin Selector /////
@@ -359,21 +410,30 @@
 
 
     var loadContents = function(jsonData) {
-      var frame = document.getElementById("startiopen_contents");
-      frame.innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
+      try {
+        Container.innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
+      } catch(e) {
+        setError("Error while parsing JSON", true);
+        console.error(jsonData)
+        return;
+      }
 
-      showGroup();
+      if(showGroup()) return;
+
+      var anchors = Container.getElementsByTagName("a");
+      if(anchors.length==0)
+        return setEmpty("No sites to display");
 
       // Make all links (except titles) open in a new tab
       if(Prefs.newWindow) {
-        [].forEach.call(frame.getElementsByTagName("a"), function(anchor) {
+        [].forEach.call(anchors, function(anchor) {
           if(anchor.getAttribute("href").indexOf("#")!==0)
             anchor.target="_blank";
         });
       }
     };
 
-    var loadJsonIsh = function() {
+    var loadJsonIsh = function(previousError) {
       var localScript = document.createElement("script");
       localScript.type = "text/javascript";
       localScript.onload = function() {
@@ -381,46 +441,62 @@
           localStorage.setItem("startiopen_sites", window.jsonData);
           localStorage.setItem("startiopen_lastFetched", new Date().getTime());
           loadContents(JSON.stringify(window.jsonData));
+        } else {
+          // load() has  thrown an error, now loadJsonIsh() failed
+          setError(previousError ? "AJAX threw an error and JSON-ish did not set window.jsonData" : "JSON-ish file did not set window.jsonData", !localStorage.getItem("startiopen_sites"))
+          loadContents(cacheData);
         }
       };
+      localScript.onerror = function(e) {
+        console.error(e)
+        setError("JSON file could not be accessed", true);
+      }
       localScript.src = Prefs.jsonPath;
       document.body.appendChild(localScript);
     }
 
     ///// Load the JSON /////
     var fetchSites = function(force) {
-      var jsonData = localStorage.getItem("startiopen_sites");
+      var cacheData = localStorage.getItem("startiopen_sites");
       var timeDiff = Math.abs(new Date().getTime() - parseInt(localStorage.getItem("startiopen_lastFetched")));
       var diffDays = Math.floor(timeDiff / (1000 * 3600 * 24));
       var autofetch = (diffDays >= Prefs.autoFetchDays);
-      Prefs.jsonIsh = true;
-      if(jsonData==null || force || autofetch)
+      if(cacheData!=null && !force && !autofetch) {
+        loadContents(cacheData);
+      } else {
         if(Prefs.jsonIsh)
           loadJsonIsh();
-        else {
+        else
           try {
-            load(Prefs.jsonPath,
-                 "application/json",
-                 function(jsonData) {
-              localStorage.setItem("startiopen_sites", jsonData);
-              localStorage.setItem("startiopen_lastFetched", new Date().getTime());
-              if(!force) //Going to refresh the page anyway
+            load(Prefs.jsonPath, "application/json", function(err, jsonData) {
+              if(jsonData) {
+                localStorage.setItem("startiopen_sites", jsonData);
+                localStorage.setItem("startiopen_lastFetched", new Date().getTime());
                 loadContents(jsonData);
+              } else {
+                //loadJsonIsh(e);
+                if(cacheData && cacheData.length>0) {
+                  setError(err + "; Using cached data");
+                  loadContents(cacheData);
+                } else
+                  setError(err, true);  // No cached data exists
+              }
             });
-            return;
           } catch(e) {
-            setError("AJAX failed to fetch the JSON for whatever reason");
-            loadJsonIsh();
+            //setError("AJAX failed to fetch the JSON for whatever reason", true);
+            console.error(e);
+            
           }
-          loadContents(jsonData);
-        }
+      }
     };
 
       if(document.getElementById("startiopen_templ_" + Prefs.theme))
         fetchSites();
       else
         try {
-          load("themes/" + Prefs.theme + ".templ", "text/html", function(data) {
+          load("themes/" + Prefs.theme + ".templ", "text/html", function(err, data) {
+            if(err)
+              throw err;
             var template = document.getElementById("startiopen_templ_Default");
             template.innerHTML = data;
             template.id = "startiopen_templ_" + Prefs.theme
@@ -450,12 +526,14 @@
         }
       }
       
-      function setError(what) {
+      function setError(what, utterFailure) {
+        what = what || "Unknown failure";
         document.getElementById("startio_mainLogo").className += " err";
         var err = document.getElementById("errorMenu");
         if(err.dataset.message) {
+          if(err.dataset.message.indexOf("\n")==-1)
+            err.textContent += "s"
           err.dataset.message += "\n" + what;
-          err.textContent += "s"
         } else
           err.dataset.message = what;
         err.style.color = "DarkRed";
@@ -464,8 +542,11 @@
         err.onclick = function() {
           alert(err.dataset.message);
         };
+        if(utterFailure)
+          setEmpty(what);
         console.error(what);
       }
+      function setEmpty(msg) { Container.innerHTML = tmpl("startiopen_empty", {message: msg}); return msg;}
 
       // Hide ALL the dialogs!
       document.onkeydown = function(evt) {
