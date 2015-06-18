@@ -322,6 +322,7 @@
     };
     function isMobile() {
       if(Prefs.forceLayout == "mobile") return true;
+      if(Prefs.forceLayout == "desktop") return false;
       try{ document.createEvent("TouchEvent"); return true; }
       catch(e){ return false; }
     }
