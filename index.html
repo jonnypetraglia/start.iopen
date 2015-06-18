@@ -16,6 +16,8 @@
         bottom: 0;
         left: 0;
         right: 0;
+        width:      100%;
+        height:     100%; 
         background: rgba(0, 0, 0, 0.7);
         transition: opacity 500ms;
         visibility: hidden;
@@ -348,8 +350,18 @@
 
 
     var loadContents = function(jsonData) {
-      document.getElementById("startiopen_contents").innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
+      var frame = document.getElementById("startiopen_contents");
+      frame.innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
+
       showGroup();
+
+      // Make all links (except titles) open in a new tab
+      if(Prefs.newWindow) {
+        [].forEach.call(frame.getElementsByTagName("a"), function(anchor) {
+          if(anchor.getAttribute("href").indexOf("#")!==0)
+            anchor.target="_blank";
+        });
+      }
     };
 
     ///// Load the JSON /////
