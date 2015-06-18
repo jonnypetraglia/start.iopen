@@ -149,7 +149,7 @@
       <script type="text/javascript">
         document.getElementById("startio_menucbox").checked = false;
       </script>
-      <label for="menu-cbox" class="logo" id="mainLogo">start.iopen</label>
+      <label for="menu-cbox" class="logo" id="startio_mainLogo">start.iopen</label>
       <ul>
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
         <li onclick="document.getElementById('startio_preferencePopup').className += ' shown'">Preferences</li>
@@ -194,6 +194,10 @@
               <p>
                 <label for="autofetch">Auto-fetch every (days):</label>
                 <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
+              </p>
+              <p>
+                  <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
+                  <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
               </p>
               <br />
               <div class="buttons">
@@ -275,7 +279,8 @@
       theme: localStorage.getItem("startiopen_theme") || "Default",
       newWindow: localStorage.getItem("startiopen_newWindow") !== false,
       forceLayout: localStorage.getItem("startiopen_forceLayout") || "auto",
-      autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7)
+      autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7),
+      jsonIsh: localStorage.getItem("startiopen_jsonIsh")
     };
     document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
     document.getElementById("startiopen_newWindow").checked = Prefs.newWindow;
@@ -283,6 +288,7 @@
     document.getElementById("startiopen_forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
     document.getElementById("startiopen_forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
     document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
+    document.getElementById("startiopen_jsonIsh").value = Prefs.jsonIsh;
 
     function savePrefs() {
       localStorage.setItem("startiopen_jsonPath", document.getElementById("startiopen_jsonPath").value)
@@ -295,6 +301,7 @@
         force = "mobile"
       localStorage.setItem("startiopen_forceLayout", force)
       localStorage.setItem("startiopen_autoFetchDays", document.getElementById("startiopen_autoFetchDays").value);
+      localStorage.setItem("startiopen_jsonIsh", document.getElementById("startiopen_jsonIsh").checked);
       location.reload()
     }
   </script>
@@ -318,6 +325,7 @@
             alert(xobj.responseText);
         }
       };
+      throw "NO"
       xobj.send(null);
     };
     function isMobile() {
@@ -365,35 +373,53 @@
       }
     };
 
+    var loadJsonIsh = function() {
+      var localScript = document.createElement("script");
+      localScript.type = "text/javascript";
+      localScript.onload = function() {
+        if(window.jsonData) {
+          localStorage.setItem("startiopen_sites", window.jsonData);
+          localStorage.setItem("startiopen_lastFetched", new Date().getTime());
+          loadContents(JSON.stringify(window.jsonData));
+        }
+      };
+      localScript.src = Prefs.jsonPath;
+      document.body.appendChild(localScript);
+    }
+
     ///// Load the JSON /////
     var fetchSites = function(force) {
       var jsonData = localStorage.getItem("startiopen_sites");
       var timeDiff = Math.abs(new Date().getTime() - parseInt(localStorage.getItem("startiopen_lastFetched")));
       var diffDays = Math.floor(timeDiff / (1000 * 3600 * 24));
       var autofetch = (diffDays >= Prefs.autoFetchDays);
-      if(jsonData==null || force || autofetch) 
-        try {
-          load(Prefs.jsonPath,
-               "application/json",
-               function(jsonData) {
-            localStorage.setItem("startiopen_sites", jsonData);
-            var d = new Date().getTime()
-            localStorage.setItem("startiopen_lastFetched", d);
-            if(!force) //Going to refresh the page anyway
-              loadContents(jsonData);
-          });
-          return;
-        } catch(e) {
-          setError("AJAX failed to fetch the JSON for whatever reason; using cached data (" + diffDays + " days old)");
+      Prefs.jsonIsh = true;
+      if(jsonData==null || force || autofetch)
+        if(Prefs.jsonIsh)
+          loadJsonIsh();
+        else {
+          try {
+            load(Prefs.jsonPath,
+                 "application/json",
+                 function(jsonData) {
+              localStorage.setItem("startiopen_sites", jsonData);
+              localStorage.setItem("startiopen_lastFetched", new Date().getTime());
+              if(!force) //Going to refresh the page anyway
+                loadContents(jsonData);
+            });
+            return;
+          } catch(e) {
+            setError("AJAX failed to fetch the JSON for whatever reason");
+            loadJsonIsh();
+          }
+          loadContents(jsonData);
         }
-      loadContents(jsonData);
     };
 
       if(document.getElementById("startiopen_templ_" + Prefs.theme))
         fetchSites();
       else
         try {
-          console.log("Fetching Sites")
           load("themes/" + Prefs.theme + ".templ", "text/html", function(data) {
             var template = document.getElementById("startiopen_templ_Default");
             template.innerHTML = data;
