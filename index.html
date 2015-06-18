@@ -4,8 +4,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>start.iopen</title>
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" type="text/css" id="stylesheet">
-  <style id="defaultStyle">
+  <link rel="stylesheet" type="text/css" id="startiopen_stylesheet">
+  <style id="startiopen_defaultStyle">
     body{background:#fff;font-family:Helvetica,Helvetica,Arial,sans-serif;margin:0}.theGroups{clear:both}.belowSpace{clear:both;height:20px}.theGroups .group{width:200px;margin:50px 0 0 90px;display:inline-block;float:left!important}.theGroups .group .title{width:185px;padding:0 0 6px 15px;border-bottom:1px solid #bcbcbc}.theGroups .group .title a{font-size:24px;text-decoration:none;color:#000}.theGroups .group .theLinks{line-height:16pt;font-size:13px;margin-top:5px;margin-left:2px;color:#000}.theGroups .group .theLinks .notUpdated{padding:2px 0 0 17px}.theGroups .group .theLinks .notUpdated a{text-decoration:none;color:#000}.theGroups .group .theLinks .notUpdated a:hover{text-decoration:underline}
   </style>
   <!-- Popup -->
@@ -127,14 +127,14 @@
   </style>
 </head>
 <body>
-  <div id="start.open-contents"></div>
+  <div id="startiopen_contents"></div>
   <nav class="menu" onload="alert('hi'); this.checked = false">
     <div>
       <input type="checkbox" id="menu-cbox" disabled >
       <script type="text/javascript">
         document.getElementById("menu-cbox").checked = false;
       </script>
-      <label for="menu-cbox">start.iopen</label>
+      <label for="menu-cbox" id="siteLogo">start.iopen</label>
       <ul>
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
         <li onclick="document.getElementById('preferencePopup').className += ' shown'">Preferences</li>
@@ -149,35 +149,35 @@
           <form class="content" id="preferenceForm" onsubmit="savePrefs(); return false;">
               <p>
                  <label for="jsonPath">Sites JSON path:
-                   <input name="jsonPath" id="start.iopen:jsonPath" type="text" style="width: 35em"> 
+                   <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
                  </label>
               </p>
               <p>
-                  <input name="newWindow" id="start.iopen:newWindow" type="checkbox">
+                  <input name="newWindow" id="startiopen_newWindow" type="checkbox">
                   <label for="newWindow">Open links in new window</label>
               </p>
               <p>
                   <label for="theme">Theme</label>
-                  <select id="start.iopen:theme" name="theme"></select>
+                  <select id="startiopen_theme" name="theme"></select>
               </p>
               <p>
                   Force layout:
                   <label>
-                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_auto" value="auto">
+                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
                       Auto-detect
                   </label>
                   <label>
-                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_desktop"value="desktop">
+                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
                       Desktop
                   </label>
                   <label>
-                      <input type="radio" name="forceLayout" id="start.iopen:forceLayout_mobile" value="mobile">
+                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
                       Mobile
                   </label>
               </p>
               <p>
                 <label for="autofetch">Auto-fetch every (days):</label>
-                <input type="number" name="autoFetchDays" id="start.iopen:autoFetchDays" style="width: 4em;" />
+                <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
               </p>
               <br />
               <div class="buttons">
@@ -194,35 +194,35 @@
 
 
     var Prefs = {
-      jsonPath: localStorage.getItem("start.iopen:jsonPath") || "sites.json",
-      theme: localStorage.getItem("start.iopen:theme") || "Default",
-      newWindow: localStorage.getItem("start.iopen:newWindow") !== false,
-      forceLayout: localStorage.getItem("start.iopen:forceLayout") || "auto",
-      autoFetchDays: parseInt(localStorage.getItem("start.iopen:autoFetchDays") || 7)
+      jsonPath: localStorage.getItem("startiopen_jsonPath") || "sites.json",
+      theme: localStorage.getItem("startiopen_theme") || "Default",
+      newWindow: localStorage.getItem("startiopen_newWindow") !== false,
+      forceLayout: localStorage.getItem("startiopen_forceLayout") || "auto",
+      autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7)
     };
-    document.getElementById("start.iopen:jsonPath").value = Prefs.jsonPath;
-    document.getElementById("start.iopen:newWindow").checked = Prefs.newWindow;
-    document.getElementById("start.iopen:forceLayout_auto").checked = Prefs.forceLayout=="auto";
-    document.getElementById("start.iopen:forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
-    document.getElementById("start.iopen:forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
-    document.getElementById("start.iopen:autoFetchDays").value = Prefs.autoFetchDays;
+    document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
+    document.getElementById("startiopen_newWindow").checked = Prefs.newWindow;
+    document.getElementById("startiopen_forceLayout_auto").checked = Prefs.forceLayout=="auto";
+    document.getElementById("startiopen_forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
+    document.getElementById("startiopen_forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
+    document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
 
     function savePrefs() {
-      localStorage.setItem("start.iopen:jsonPath", document.getElementById("start.iopen:jsonPath").value)
-      localStorage.setItem("start.iopen:theme", document.getElementById("start.iopen:theme").value)
-      localStorage.setItem("start.iopen:newWindow", document.getElementById("start.iopen:newWindow").checked)
+      localStorage.setItem("startiopen_jsonPath", document.getElementById("startiopen_jsonPath").value)
+      localStorage.setItem("startiopen_theme", document.getElementById("startiopen_theme").value)
+      localStorage.setItem("startiopen_newWindow", document.getElementById("startiopen_newWindow").checked)
       var force = "auto";
-      if(document.getElementById("start.iopen:forceLayout_desktop").checked)
+      if(document.getElementById("startiopen_forceLayout_desktop").checked)
         force = "desktop"
-      else if(document.getElementById("start.iopen:forceLayout_mobile").checked)
+      else if(document.getElementById("startiopen_forceLayout_mobile").checked)
         force = "mobile"
-      localStorage.setItem("start.iopen:forceLayout", force)
-      localStorage.setItem("start.iopen:autoFetchDays", document.getElementById("start.iopen:autoFetchDays").value);
+      localStorage.setItem("startiopen_forceLayout", force)
+      localStorage.setItem("startiopen_autoFetchDays", document.getElementById("startiopen_autoFetchDays").value);
       location.reload()
     }
   </script>
 
-  <script type="text/html" id="Default">
+  <script type="text/html" id="startiopen_templ_Default">
     <div class="theGroups">
       <% for ( var groupName in groups ) { %>
         <% links = groups[groupName]; %>
@@ -247,7 +247,7 @@
     </div>
   </script>
 
-  <script type="text/html" id="Mobile">
+  <script type="text/html" id="startiopen_templ_Mobile">
     <% for ( var groupName in groups ) { %>
       <% links = groups[groupName]; %>
       <div class="group" id="<%=groupName%>">
@@ -300,7 +300,7 @@
     }
 
     ///// Set up the Skin Selector /////
-    var themeselector = document.getElementById("start.iopen:theme"); //document.createElement("select");
+    var themeselector = document.getElementById("startiopen_theme"); //document.createElement("select");
     themes.forEach(function(theme) {
       var themeOpt = document.createElement("option");
       themeOpt.textContent = theme;
@@ -308,62 +308,88 @@
       themeselector.appendChild(themeOpt);
     });
 
-    var style = document.getElementById("defaultStyle");
-    if(isMobile()) {
-      style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
-      Prefs.theme = "Mobile";
-    } else {
-
-      ///// Load the CSS /////
-      if(Prefs.theme!="Default") {
-        var stylesheet = document.getElementById("stylesheet");
-        if(themesReset.indexOf(Prefs.theme)>0) {
-          var reset = stylesheet.cloneNode();
-          reset.href = "themes/reset.css";
-          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
-        }
-        stylesheet.href = "themes/" + Prefs.theme + ".css";
-        style.parentElement.removeChild(style); //remove Default's CSS
-      }
-    }
-
     var loadContents = function(jsonData) {
-      console.log("Loaded elements", jsonData)
-      document.getElementById("start.open-contents").innerHTML = tmpl(Prefs.theme, {groups: JSON.parse(jsonData)});
+      document.getElementById("startiopen_contents").innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
+
+      var style = document.getElementById("startiopen_defaultStyle");
+      if(isMobile()) {
+        style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
+        Prefs.theme = "Mobile";
+      } else {
+
+        ///// Load the CSS /////
+        if(Prefs.theme!="Default") {
+          var stylesheet = document.getElementById("startiopen_stylesheet");
+          if(themesReset.indexOf(Prefs.theme)>0) {
+            var reset = stylesheet.cloneNode();
+            reset.href = "themes/reset.css";
+            document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+          }
+          stylesheet.href = "themes/" + Prefs.theme + ".css";
+          style.parentElement.removeChild(style); //remove Default's CSS
+        }
+      }
+
       showGroup();
     };
 
     ///// Load the JSON /////
     var fetchSites = function(force) {
-      var jsonData = localStorage.getItem("start.iopen:sites");
-      var timeDiff = Math.abs(new Date().getTime() - parseInt(localStorage.getItem("start.iopen:lastFetched")));
+      var jsonData = localStorage.getItem("startiopen_sites");
+      var timeDiff = Math.abs(new Date().getTime() - parseInt(localStorage.getItem("startiopen_lastFetched")));
       var diffDays = Math.floor(timeDiff / (1000 * 3600 * 24));
       var autofetch = (diffDays >= Prefs.autoFetchDays);
-      if(jsonData!==null && !force && !autofetch)
-        loadContents(jsonData);
-      else {
-        load(Prefs.jsonPath,
-             "application/json",
-             function(jsonData) {
-          localStorage.setItem("start.iopen:sites", jsonData);
-          var d = new Date().getTime()
-          localStorage.setItem("start.iopen:lastFetched", d);
-          if(!force) //Going to refresh the page anyway
-            loadContents(jsonData);
-        });
-      }
+      if(jsonData==null || force || autofetch) 
+        try {
+          load(Prefs.jsonPath,
+               "application/json",
+               function(jsonData) {
+            localStorage.setItem("startiopen_sites", jsonData);
+            var d = new Date().getTime()
+            localStorage.setItem("startiopen_lastFetched", d);
+            if(!force) //Going to refresh the page anyway
+              loadContents(jsonData);
+          });
+          return;
+        } catch(e) {
+          setError("AJAX failed to fetch the JSON for whatever reason; loading cached data");
+        }
+      loadContents(jsonData);
     };
 
-    if(document.getElementById(Prefs.theme)) {
-      fetchSites();
-    }
-    else 
-      load("themes/" + Prefs.theme + ".templ", "text/html", function(data) {
-        var template = document.getElementById("Default");
-        template.innerHTML = data;
-        template.id = Prefs.theme
+      if(document.getElementById("startiopen_templ_" + Prefs.theme))
         fetchSites();
-      });
+      else
+        try {
+          console.log("Fetching Sites")
+          load("themes/" + Prefs.theme + ".templ", "text/html", function(data) {
+            var template = document.getElementById("startiopen_templ_Default");
+            template.innerHTML = data;
+            template.id = Prefs.theme
+            fetchSites();
+          });
+        } catch(e) {
+          setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme")
+          Prefs.theme = "Default";
+          fetchSites();
+        }
+      
+      function setError(what) {
+        document.getElementById("siteLogo").className += " err";
+        var err = document.getElementById("errorMenu");
+        if(err.dataset.message) {
+          err.dataset.message += "\n" + what;
+          err.textContent += "s"
+        } else
+          err.dataset.message = what;
+        err.style.color = "DarkRed";
+        err.title = err.dataset.message;
+        err.style.display = "";
+        err.onclick = function() {
+          alert(err.dataset.message);
+        };
+        console.error(what);
+      }
   </script>
 
 </body>
