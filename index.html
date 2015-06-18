@@ -83,6 +83,13 @@
         -o-user-select: none;
         user-select: none;
       }
+      .menu .err {
+        color: DarkRed;
+
+      }
+      .menu ul li.err:hover {
+        background: Pink;
+      }
       .menu label {
         color: black;
         padding: 0.5em 1em;
@@ -139,6 +146,7 @@
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
         <li onclick="document.getElementById('preferencePopup').className += ' shown'">Preferences</li>
         <li>About</li>
+        <li id="errorMenu" class="err" style="display:none">Error</li>
       </ul>
       <span>&nbsp;</span>
     </div>
