@@ -8,53 +8,46 @@
   <style id="startiopen_defaultStyle">
     body{background:#fff;font-family:Helvetica,Helvetica,Arial,sans-serif;margin:0}.theGroups{clear:both}.belowSpace{clear:both;height:20px}.theGroups .group{width:200px;margin:50px 0 0 90px;display:inline-block;float:left!important}.theGroups .group .title{width:185px;padding:0 0 6px 15px;border-bottom:1px solid #bcbcbc}.theGroups .group .title a{font-size:24px;text-decoration:none;color:#000}.theGroups .group .theLinks{line-height:16pt;font-size:13px;margin-top:5px;margin-left:2px;color:#000}.theGroups .group .theLinks .notUpdated{padding:2px 0 0 17px}.theGroups .group .theLinks .notUpdated a{text-decoration:none;color:#000}.theGroups .group .theLinks .notUpdated a:hover{text-decoration:underline}
   </style>
-  <!-- Popup -->
+  <!-- Preferences and About dialogs -->
   <style>
-      .overlay {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width:      100%;
-        height:     100%; 
-        background: rgba(0, 0, 0, 0.7);
-        transition: opacity 500ms;
-        visibility: hidden;
-        opacity: 0;
-        z-index: 9999999;
-      }
-      .popup p {
-        margin: 2em auto;
-      }
-      .popup {
-        margin: 2em auto;
-        padding: 0.5em 1.5em 1.5em 1.5em;
-        background: #fff;
-        border-radius: 0.5em;
-        width: 25em;
-        max-width: 100%;
-        position: relative;
-        transition: all 3s ease-in-out;
+      .dialog {
         font: normal 1em sans-serif;
+        text-align: center;
+        padding: 5em 10em 2em 10em;
+        padding: 5% 10% 2% 10%;
       }
-      .popup .buttons {
-          text-align:right;
+      .dialog p {
+        margin: 2em auto;
       }
-      .popup .buttons button {
-          font-size: 0.75em;
-          background: #75B4D2;
-          border-radius: 1em;
-          padding: 0.5em 1em;
-          color: white;
-          cursor: pointer;
+      .dialog > * {
+        text-align:left;
       }
-      .popup .buttons button:hover {
-          background: #5d90a8;
+      .dialog button:not(.nostyle) {
+        font-size: 0.75em;
+        background: #75B4D2;
+        border-radius: 1em;
+        padding: 0.5em 1em;
+        color: white;
+        cursor: pointer;
       }
-      .popup .popupTitle {
-        font: normal 1.5em sans-serif;
+      .dialog button:hover:not(.nostyle) {
+        background: #5d90a8;
+      }
+      .dialog h1 {
+        font: normal 4em sans-serif;
         margin: 0;
+      }
+      #startiopen_about {
+        background: red;
+        background: linear-gradient(gray, white);
+      }
+      #startiopen_about span {
+        display: inline-block;
+        line-height: 1.5;
+        font-size: 1.5em;
+        font-family: 'Helvetica Neue','Helvetica','Open Sans',sans-serif;
+        font-weight: 200;
+        margin-left: 1em;
       }
   </style>
   <!-- Menu on the left -->
@@ -184,7 +177,7 @@
 </head>
 <body>
   <div id="startiopen_container"></div>
-  <nav class="menu" onload="alert('hi'); this.checked = false">
+  <nav id="startiopen_nav" class="menu" onload="alert('hi'); this.checked = false">
     <div>
       <input type="checkbox" id="startio_menucbox" disabled style="display: none;">
       <script type="text/javascript">
@@ -193,88 +186,87 @@
       <label for="menu-cbox" class="logo" id="startio_mainLogo">start.iopen</label>
       <ul>
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
-        <li onclick="document.getElementById('startio_preferencePopup').className += ' shown'">Preferences</li>
-        <li onclick="document.getElementById('startio_aboutPopup').className += ' shown'">About</li>
+        <li onclick="showDialog(document.getElementById('startiopen_preferences'))">Preferences</li>
+        <li onclick="showDialog(document.getElementById('startiopen_about'))">About</li>
         <li id="errorMenu" class="err" style="display:none">Error</li>
       </ul>
       <span>&nbsp;</span>
     </div>
   </nav>
-  <div id="startio_preferencePopup" class="overlay">
-      <div class="popup">
-          <div class="popupTitle">Preferences</div>
-          <form class="content" onsubmit="savePrefs(); return false;">
-              <p>
-                 <label for="jsonPath">Sites JSON path:
-                   <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
-                 </label>
-              </p>
-              <p>
-                  <input name="newWindow" id="startiopen_newWindow" type="checkbox">
-                  <label for="newWindow">Open links in new window</label>
-              </p>
-              <p>
-                  <label for="theme">Theme</label>
-                  <select id="startiopen_theme" name="theme"></select>
-              </p>
-              <p>
-                  Force layout:
-                  <label>
-                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
-                      Auto-detect
-                  </label>
-                  <label>
-                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
-                      Desktop
-                  </label>
-                  <label>
-                      <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
-                      Mobile
-                  </label>
-              </p>
-              <p>
-                <label for="autofetch">Auto-fetch every (days):</label>
-                <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
-              </p>
-              <p>
-                  <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
-                  <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
-              </p>
-              <br />
-              <div class="buttons">
-                  <button>Save</a>
-                  <button onclick="document.getElementById('startio_preferencePopup').className = 'overlay'; return false;">Cancel</button>
-              </div>
-          </form>
-          <p>
-            Debug:
-            <button onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
-          </p>
-      </div>
+  <div id="startiopen_preferences" class="dialog" style="display: none;">
+        <h1>Preferences</h1>
+        <form onsubmit="savePrefs(); return false;">
+            <p>
+               <label for="jsonPath">Sites JSON path:
+                 <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
+               </label>
+            </p>
+            <p>
+                <input name="newWindow" id="startiopen_newWindow" type="checkbox">
+                <label for="newWindow">Open links in new window</label>
+            </p>
+            <p>
+                <label for="theme">Theme</label>
+                <select id="startiopen_theme" name="theme"></select>
+            </p>
+            <p>
+                Force layout:
+                <label>
+                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
+                    Auto-detect
+                </label>
+                <label>
+                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
+                    Desktop
+                </label>
+                <label>
+                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
+                    Mobile
+                </label>
+            </p>
+            <p>
+              <label for="autofetch">Auto-fetch every (days):</label>
+              <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
+            </p>
+            <p>
+                <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
+                <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
+            </p>
+            <br />
+            <button>Save</a>
+            <button onclick="hideDialog(document.getElementById('startiopen_preferences')); return false">Cancel</button>
+        </form>
+        <p>
+          Debug:
+          <button class="nostyle" onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
+        </p>
   </div>
-  <div id="startio_aboutPopup" class="overlay">
-    <div class="popup">
-        <div class="popupTitle">About</div>
-        <div class="content">
-          <div class="logo" style="font-size: 3.14em">start.iopen</div>
-          <br/>
-            Version
-            <script type="text/javascript">document.write(document.getElementById("startiopen_favicon").href.split("?")[1].substr(2))</script>
-          <br/>
-            <a href="http://opensource.org/licenses/MIT" title="OpenSource.org MIT License" target="_blank">
-              MIT License
-            </a>
-          <br/>
-            Copyright 2015
-            <a href="http://qweex.com" title="Qweex website" target="_blank">Qweex LLC</a>
-          <br/><br/>
-            <a href="http://bitbucket/notbryant/start.iopen" title="Start.iopen BitBucket repo" target="_blank">Source available on BitBucket</a>
-          <br/><br/>
-          <div class="buttons">
-            :)
-            <button onclick="document.getElementById('startio_aboutPopup').className = 'overlay'; return false;">Done</button>
-          </div>
-        </div>
+  <div id="startiopen_about" class="dialog" style="display: none;">
+    <div>
+      <div class="logo" style="font-size: 3.14em">start.iopen</div>
+      <span style="margin-top: 1.3em">
+        Version
+        <script type="text/javascript">document.write(document.getElementById("startiopen_favicon").href.split("?")[1].substr(2))</script>
+      </span>
+      <br/>
+      <span>
+        <a href="http://opensource.org/licenses/MIT" title="OpenSource.org MIT License" target="_blank">
+          MIT License
+        </a>
+      </span>
+      <br/>
+      <span>
+        Copyright 2015
+        <a href="http://qweex.com" title="Qweex website" target="_blank">Qweex LLC</a>
+      </span>
+      <br/><br/>
+      <span><small>
+        <a href="http://github.com/notbryant/start.iopen" title="Start.iopen GitHub repo" target="_blank">Source available on GitHub</a>
+        ツ
+      </small></span>
+      <br/><br/>
+      <button style="float:right" onclick="hideDialog(document.getElementById('startiopen_about')); return false">Done</button>
+    </div>
   </div>
 
   <script type="text/html" id="startiopen_templ_Default">
@@ -362,7 +354,8 @@
   </script>
 
   <script type="text/javascript">
-    var Container = document.getElementById("startiopen_container");
+    var Container = document.getElementById("startiopen_container"),
+        Nav = document.getElementById("startiopen_nav");
     function load(file, mimetype, callback) {
       Container.innerHTML = "<div class='loading'></div>";
       var xobj = new XMLHttpRequest();
@@ -548,14 +541,21 @@
       }
       function setEmpty(msg) { Container.innerHTML = tmpl("startiopen_empty", {message: msg}); return msg;}
 
-      // Hide ALL the dialogs!
+      function showDialog(div) {
+        Container.style.display=Nav.style.display='none';
+        div.style.display='block';
+      }
+      function hideDialog(div) {
+        Nav.style.display = 'inline-block';
+        Container.style.display = '';
+        div.style.display = 'none';
+      }
+
       document.onkeydown = function(evt) {
           evt = evt || window.event;
-          if (evt.keyCode == 27) {
-            [].forEach.call(document.getElementsByClassName('overlay'), function(popup) {
-              popup.className = 'overlay';
-            });
-          }
+          if (evt.keyCode == 27)
+            // Hide ALL the dialogs!
+            [].forEach.call(document.getElementsByClassName('dialog'), hideDialog);
       };
 
   </script>
