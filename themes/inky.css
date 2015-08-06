@@ -5,16 +5,16 @@ body {
   font: 300 1em/1.5 'Helvetica Neue', 'Helvetica', sans-serif;
   margin: 3em 0 3em 2em;
 }
-h1, h2 {
+main h1, main h2 {
   font-family: 'Gill Sans', 'Helvetica Neue', 'Helvetica', sans-serif;
   text-transform: uppercase;
 }
-h1 {
+main h1 {
   font-size: 1.2em;
   line-height: 1.25;
   margin: 0 0 2.5em;
 }
-h2 {
+main h2 {
   color: #444;
   font-size: 1em;
   font-weight: 300;
@@ -26,22 +26,22 @@ h2 {
   margin: 0 2em 3em 0;
   width: 18em;
 }
-ol {
+main ol {
   color: #bbb;
   list-style-type: katakana;
   margin: 0 0 0 2em;
   padding: 0;
 }
-ol li {
+main ol li {
   padding-left: 1em;
   text-indent: -1em;
 }
-a {
+main a {
   -webkit-transition:
     color 0.25s ease-out,
     border 0.25s ease-out;
 }
-#body a:link, #body a:visited {
+main a:link, main a:visited {
   color: #000;
   font-weight: 600;
   text-decoration: none;
@@ -49,19 +49,19 @@ a {
   border-left: 0 solid #fff;
   border-right: 1em solid #fff;
 }
-#body a:hover, #body a:active {
+main a:hover, main a:active {
   color: #444;
   border-right-width: 0;
   border-left-width: 1em;
   border-bottom-color: #444;
 }
-#body .updated a:link, #body .updated a:visited {
+main .updated a:link, main .updated a:visited {
   color: #d00;
 }
-#body .updated a:hover, #body .updated a:active {
+main .updated a:hover, main .updated a:active {
   color: #444;
 }
-h1 a {
+main h1 a {
   font-weight: 400 !important;
   border-bottom-width: 0 !important;
 }

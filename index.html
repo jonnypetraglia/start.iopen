@@ -10,123 +10,123 @@
   </style>
   <!-- Preferences and About dialogs -->
   <style>
-      .dialog {
-        font: normal 1em sans-serif;
-        text-align: center;
-        margin: 2.5% 5% 1% 5%;
-        padding: 2.5% 5% 1% 5%;
-        color: black;
-        background: white;
-        border-radius: 1em;
-      }
-      .dialog p {
-        margin: 2em auto;
-      }
-      .dialog > * {
-        text-align:left;
-      }
-      .dialog button:not(.nostyle) {
-        font-size: 0.75em;
-        background: #75B4D2;
-        border-radius: 1em;
-        padding: 0.5em 1em;
-        color: white;
-        cursor: pointer;
-      }
-      .dialog button:hover:not(.nostyle) {
-        background: #5d90a8;
-      }
-      .dialog h1 {
-        font: normal 4em sans-serif;
-        margin: 0;
-      }
-      #startiopen_about span {
-        display: inline-block;
-        line-height: 1.5;
-        font-size: 1.5em;
-        font-family: 'Helvetica Neue','Helvetica','Open Sans',sans-serif;
-        font-weight: 200;
-        margin-left: 1em;
-      }
+    .dialog {
+      font: normal 1em sans-serif;
+      text-align: center;
+      margin: 2.5% 5% 1% 5%;
+      padding: 2.5% 5% 1% 5%;
+      color: black;
+      background: white;
+      border-radius: 1em;
+    }
+    .dialog p {
+      margin: 2em auto;
+    }
+    .dialog > * {
+      text-align:left;
+    }
+    .dialog button:not(.nostyle) {
+      font-size: 0.75em;
+      background: #75B4D2;
+      border-radius: 1em;
+      padding: 0.5em 1em;
+      color: white;
+      cursor: pointer;
+    }
+    .dialog button:hover:not(.nostyle) {
+      background: #5d90a8;
+    }
+    .dialog h1 {
+      font: normal 4em sans-serif;
+      margin: 0;
+    }
+    #startiopen_about span {
+      display: inline-block;
+      line-height: 1.5;
+      font-size: 1.5em;
+      font-family: 'Helvetica Neue','Helvetica','Open Sans',sans-serif;
+      font-weight: 200;
+      margin-left: 1em;
+    }
   </style>
   <!-- Menu on the left -->
   <style>
-      .menu {
-        top: 0;
-        left: 2em;
-        position: absolute;
-        z-index: 9999998;
-        color: #464646;
-      }
-      .menu {
-        display: inline-block;
-        font: bold 1em/0.5em sans-serif;
-      }
-      .menu label,
-      .menu ul li,
-      .menu span {
-        border-left: #aaa 1px solid;
-        border-right: #aaa 1px solid;
-        background: #F6F6F6;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -o-user-select: none;
-        user-select: none;
-      }
-      .menu .err { color: DarkRed; }
-      .menu ul li.err:hover { background: Pink; }
-      .menu label {
-        display: inline-block;
-        display: block;
-        text-align: center;
-        color: black;
-        text-shadow: none;
-      }
-      .logo {
-        padding: 0.5em 1em;
-        color: #F6F6F6;
-        font-weight: bold;
-        text-shadow: 1px 1px black;
-        background: #353535;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -o-user-select: none;
-        user-select: none;
-        cursor: default;
-      }
-      .menu > div:hover ul,
-      .menu input[type=checkbox]:checked ~ ul {
-        display: block;
-      }
-      .menu ul {
-        font: normal 0.75em/1.6em sans-serif;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: none;
-        text-align: center;
-      }
-      .menu ul li:hover {
-        background: #75B4D2;
-        color: white;
-        cursor: pointer;
-      }
-      .menu ul li,
-      .menu span {
-        border-top: #E7E7E7 1px solid;
-      }
-      .menu span {
-        height: 0.5em;
-        padding: 0;
-        border-bottom: #aaa 1px solid;
-        border-bottom-left-radius: 1em;
-        border-bottom-right-radius: 1em;
-        display: block;
-        cursor: default;
-      }
+    .menu {
+      top: 0;
+      left: 2em;
+      position: absolute;
+      z-index: 9999998;
+      color: #464646;
+    }
+    .menu {
+      display: inline-block;
+      font: bold 1em/0.5em sans-serif;
+    }
+    .menu label,
+    .menu ul li,
+    .menu span {
+      border-left: #aaa 1px solid;
+      border-right: #aaa 1px solid;
+      background: #F6F6F6;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+    }
+    .menu .err { color: DarkRed; }
+    .menu ul li.err:hover { background: Pink; }
+    .menu label {
+      display: inline-block;
+      display: block;
+      text-align: center;
+      color: black;
+      text-shadow: none;
+    }
+    .logo {
+      padding: 0.5em 1em;
+      color: #F6F6F6;
+      font-weight: bold;
+      text-shadow: 1px 1px black;
+      background: #353535;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+      cursor: default;
+    }
+    .menu > div:hover ul,
+    .menu input[type=checkbox]:checked ~ ul {
+      display: block;
+    }
+    .menu ul {
+      font: normal 0.75em/1.6em sans-serif;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: none;
+      text-align: center;
+    }
+    .menu ul li:hover {
+      background: #75B4D2;
+      color: white;
+      cursor: pointer;
+    }
+    .menu ul li,
+    .menu span {
+      border-top: #E7E7E7 1px solid;
+    }
+    .menu span {
+      height: 0.5em;
+      padding: 0;
+      border-bottom: #aaa 1px solid;
+      border-bottom-left-radius: 1em;
+      border-bottom-right-radius: 1em;
+      display: block;
+      cursor: default;
+    }
   </style>
   <!-- Spinner from https://twitter.com/veganben/status/415373812360679425 -->
   <style>
@@ -193,52 +193,52 @@
     </div>
   </nav>
   <div id="startiopen_preferences" class="dialog" style="display: none;">
-        <h1>Preferences</h1>
-        <form onsubmit="savePrefs(); return false;">
-            <p>
-               <label for="jsonPath">Sites JSON path:
-                 <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
-               </label>
-            </p>
-            <p>
-                <input name="newWindow" id="startiopen_newWindow" type="checkbox">
-                <label for="newWindow">Open links in new window</label>
-            </p>
-            <p>
-                <label for="theme">Theme</label>
-                <select id="startiopen_theme" name="theme"></select>
-            </p>
-            <p>
-                Force layout:
-                <label>
-                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
-                    Auto-detect
-                </label>
-                <label>
-                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
-                    Desktop
-                </label>
-                <label>
-                    <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
-                    Mobile
-                </label>
-            </p>
-            <p>
-              <label for="autofetch">Auto-fetch every (days):</label>
-              <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
-            </p>
-            <p>
-                <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
-                <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
-            </p>
-            <br />
-            <button>Save</a>
-            <button onclick="hideDialog(document.getElementById('startiopen_preferences')); return false">Cancel</button>
-        </form>
-        <p>
-          Debug:
-          <button class="nostyle" onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
-        </p>
+    <h1>Preferences</h1>
+    <form onsubmit="savePrefs(); return false;">
+      <p>
+        <label for="jsonPath">Sites JSON path:
+          <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
+        </label>
+      </p>
+      <p>
+        <input name="newWindow" id="startiopen_newWindow" type="checkbox">
+        <label for="newWindow">Open links in new window</label>
+      </p>
+      <p>
+        <label for="theme">Theme</label>
+        <select id="startiopen_theme" name="theme"></select>
+      </p>
+      <p>
+        Force layout:
+        <label>
+            <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
+            Auto-detect
+        </label>
+        <label>
+            <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
+            Desktop
+        </label>
+        <label>
+            <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
+            Mobile
+        </label>
+      </p>
+      <p>
+        <label for="autofetch">Auto-fetch every (days):</label>
+        <input type="number" name="autoFetchDays" id="startiopen_autoFetchDays" style="width: 4em;" />
+      </p>
+      <p>
+          <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
+          <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
+      </p>
+      <br />
+      <button>Save</a>
+      <button onclick="hideDialog(document.getElementById('startiopen_preferences')); return false">Cancel</button>
+    </form>
+    <p>
+      Debug:
+      <button class="nostyle" onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
+    </p>
   </div>
   <div id="startiopen_about" class="dialog" style="display: none;">
     <div>
