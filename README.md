@@ -6,7 +6,8 @@ for your favorite links.
 It's designed to be **open-source** and therefore **self-hostable**, work
 **locally*, and be so simply written in **vanilla JS** that it should run in
 all modern browsers, and -most importantly- be essentially self-contained in
-**one HTML file** and your sites in **one JSON file**.
+**one HTML file** and your sites in **one JSON file**. And lastly: it's designed
+to load even when **despite internet failure**.
 
 
 ## Editing your sites ##
@@ -30,7 +31,9 @@ That simple.
 
 ## Themes & "One File" ##
 
-Themes are stored separately but are entirely optional and are made of two parts
+Themes are *entirely optional* if you want simplicity and a standalone file.
+
+It's very easy to write your own theme which is comprised of two files:
 
   (1) <theme-name>.css
   (2) <theme-name>.templ
@@ -43,17 +46,36 @@ via the `groups` variable, write your own CSS, and add the name of your theme to
  the `themes` variable in the first `script` tag in `body`.
 
 
-## Using Locally ##
+## Ideal usage ##
+
+The setup to start.iopen involves just hosting your JSON file somewhere. That's
+it.
+
+From there you can either host index.html (+themes if desired) or store them
+locally on your machine which will allow you to access your sites even when the
+internet is down. This is possible because start.iopen caches your sites using
+HTML localStorage so even if the internet is down, the page will load.
+
+Why load your list of favorites if the internet is down? Because it's the era of
+the web, of HTML5, of life within the browser and favorites are not just
+websites anymore.
+(Example: [FireSSH](https://addons.mozilla.org/EN-us/firefox/addon/firessh/))
+
+Also network problems are annoying enough without seeing a loading icon every
+time you open a new tab.
+
+
+## Local usage ##
 
 Using start.iopen locally is indeed possible, with some caveats depending on
 the browser you use. Because browser security is ever tightening, some browsers
 are more strict for local files.
 
 For example, Chrome will not let a local file interact with any other local
-files via AJAX, which is how 
+files via AJAX, which is how start.iopen fetches the JSON.
 
-For example, Firefox works flawlessly because they let files access other files
-in the same lcoal directory.
+Meanwhile, Firefox works flawlessly because they let files access other files
+in the same local directory.
 
 
 ### JSON ###
@@ -65,12 +87,12 @@ Thus there are two solutions:
   For Chrome, it would be launching it with the parameter
   `--allow-file-access-from-files`, which admittedly does lessen security overall.
 
- #### 2. Make the JSON "JSON-esque"
+  #### 2. Make the JSON "JSON-esque"
 
   Adding the line:
     ```jsonData=```
   to your sites JSON file will then let start.iopen read it as though it were JS,
-  making Chrome Happy.
+  making browsers like Chrome happy.
 
 ### Themes ###
 
@@ -78,7 +100,7 @@ For themes, the only real solution is to paste the contents of the theme(s) you
 want into `index.html` inside a `<script>` tag like so:
 
 ```
-<script type="text/html" id="THEME_NAME">
+<script type="text/html" id="startiopen_templ_{{THEME_NAME}}">
   ... file contents ...
 </script
 ```
