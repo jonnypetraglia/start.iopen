@@ -31,20 +31,15 @@ That simple.
 
 ## Themes & "One File" ##
 
-Themes are *entirely optional* if you want simplicity and a standalone file.
-
-It's very easy to write your own theme which is comprised of two files:
+As stated, start.iopen is self-contained in one file. But there's also external
+skins that are *entirely optional*. A theme is just two files inside the
+'themes' directory:
 
   (1) <theme-name>.css
   (2) <theme-name>.templ
 
 start.iopen uses [John Resig's Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/)
-for templating.
-
-You can easily write your own theme by using your JSON data which is available
-via the `groups` variable, write your own CSS, and add the name of your theme to
- the `themes` variable in the first `script` tag in `body`.
-
+for templating so it's fast and simple.
 
 ## Ideal usage ##
 
@@ -107,6 +102,29 @@ want into `index.html` inside a `<script>` tag like so:
 
 There are already two templates for "Default" and "Mobile" that work along this
 practice.
+
+
+### Writing your own theme ###
+
+You can easily write your own theme. You can write an HTML template using your
+JSON data as the variable `groups`, then just write whatever CSS you want to
+style it. You can include any valid HTML inside your template, including
+Javascript, so you can do things like `document.title = 'mah title';`.
+
+Here are a few tips about writing your own theme:
+
+  - Assign the id of the div with the 'group' class to the group name; this will
+    allow you to view just that group and even link to just it.
+    (```<div class="group" id="<%=groupName%>">```)
+  - Avoid using hardcoded ids. Mostly just so it won't interfere with the above.
+  - Make sure your styles stay contained inside `<main>`, otherwise things like
+    the menu and preferences will look weird.
+
+
+And lastly, if you write a theme that you like, feel free to submit it to the
+[Github repo](http://github.com/notbryant/start.iopen) or create a
+[Gist](https://gist.github.com/) for it or just email me (address is in the
+commit log).
 
 
 ## Things lacking from start.io ##
