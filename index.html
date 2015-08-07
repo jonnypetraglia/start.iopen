@@ -373,18 +373,22 @@
     // Perform an AJAX call
     function ajax(file, mimetype, callback) {
       Container.innerHTML = "<div class='loading'></div>";
-      var xobj = new XMLHttpRequest();
-      xobj.overrideMimeType(mimetype);
-      xobj.open('GET', file, true);
-      xobj.onreadystatechange = function () {
-        if (xobj.readyState == 4) {
-          if(xobj.status == "200")
-            callback(null, xobj.responseText);
-          else
-            callback(xobj.status == "0" ? "CORS request not allowed" : "AJAX failed: " + xobj.status + " " + xobj.statusText);
-        }
-      };
-      xobj.send(null);
+      try {
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType(mimetype);
+        xobj.open('GET', file, true);
+        xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4) {
+            if(xobj.status == "200")
+              callback(null, xobj.responseText);
+            else
+              throw null;
+          }
+        };
+        xobj.send(null);
+      } catch(e) {
+        callback(xobj.status == "0" ? "CORS request not allowed" : "AJAX failed: " + xobj.status + " " + xobj.statusText);
+      }
     };
 
     // Creates the HTML entities from the JSON and puts them into the DOM
@@ -447,26 +451,20 @@
         if(Prefs.jsonIsh)
           loadJsonIsh();
         else
-          try {
-            ajax(Prefs.jsonPath, "application/json", function(err, jsonData) {
-              if(jsonData) {
-                localStorage.setItem("startiopen_sites", jsonData);
-                localStorage.setItem("startiopen_lastFetched", new Date().getTime());
-                populateDOM(jsonData);
-              } else {
-                //loadJsonIsh(e);
-                if(cacheData && cacheData.length>0) {
-                  setError(err + "; Using cached data");
-                  populateDOM(cacheData);
-                } else
-                  setError(err, true);  // No cached data exists
-              }
-            });
-          } catch(e) {
-            //setError("AJAX failed to fetch the JSON for whatever reason", true);
-            console.error(e);
-            
-          }
+          ajax(Prefs.jsonPath, "application/json", function(err, jsonData) {
+            if(jsonData) {
+              localStorage.setItem("startiopen_sites", jsonData);
+              localStorage.setItem("startiopen_lastFetched", new Date().getTime());
+              populateDOM(jsonData);
+            } else {
+              //loadJsonIsh(e);
+              if(cacheData && cacheData.length>0) {
+                setError(err + "; Using cached data");
+                populateDOM(cacheData);
+              } else
+                setError(err, true);  // No cached data exists
+            }
+          });
       }
     };
 
