@@ -189,8 +189,8 @@
       <label for="menu-cbox" class="logo" id="startio_mainLogo">start.iopen</label>
       <ul>
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
-        <li onclick="showDialog(document.getElementById('startiopen_preferences'))">Preferences</li>
-        <li onclick="showDialog(document.getElementById('startiopen_about'))">About</li>
+        <li onclick="showDialog('preferences')">Preferences</li>
+        <li onclick="showDialog('about')">About</li>
         <li id="errorMenu" class="err" style="display:none">Error</li>
       </ul>
       <span><i style="visibility: hidden">:)</i></span> <!-- Creates the small rounded bottom piece of the menu -->
@@ -238,11 +238,11 @@
       </p>
       <br />
       <button>Save</a>
-      <button onclick="hideDialog(document.getElementById('startiopen_preferences')); return false">Cancel</button>
+      <button onclick="hideDialogs(); return false">Cancel</button>
     </form>
     <p>
       Debug:
-      <button class="nostyle" onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
+      <button class="nostyle" onclick="confirm('Clear preferences & cache?') && !localStorage.clear() && location.reload();">Clear</button>
     </p>
   </div>
   <!-- The screen that displays info about the app -->
@@ -271,7 +271,7 @@
       </small></span>
       <br/><br/>
       <small style="width: 100%; text-align: right; display: inline-block; margin: 1em">
-        <button onclick="hideDialog(document.getElementById('startiopen_about')); return false">Done</button>
+        <button onclick="hideDialogs(); return false">Done</button>
       </small>
     </div>
   </div>
@@ -505,15 +505,19 @@
     }
 
     // Dialog functions
-    function showDialog(div) {
+    function showDialog(name) {
+      history.pushState(null, null, location.href);
       Container.style.display=Nav.style.display='none';
-      div.style.display='block';
+      document.getElementById("startiopen_"+name).style.display='block';
     }
-    function hideDialog(div) {
+    function hideDialogs() {
       Nav.style.display = 'inline-block';
       Container.style.display = '';
-      div.style.display = 'none';
+      var dialogs = document.getElementsByClassName("dialog")
+      for(var i=0; i<dialogs.length; i++)
+        dialogs[i].style.display = 'none';
     }
+    window.addEventListener("popstate", hideDialogs);
 
     // Show JUST a group specified by the URL hash
     window.onhashchange = showGroup;
@@ -531,9 +535,10 @@
     // Make Esc hide the dialogs
     document.onkeydown = function(evt) {
         evt = evt || window.event;
-        if (evt.keyCode == 27)
-          [].forEach.call(document.getElementsByClassName('dialog'), hideDialog);
+        if(evt.keyCode == 27)
+          history.back();
     };
+
 
 
     ////////////// End of functions, start the actual execution //////////////
