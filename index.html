@@ -582,7 +582,7 @@
     if(document.getElementById("startiopen_templ_" + Prefs.theme))
       fetchSites();
     else
-        ajax("themes/" + Prefs.theme + ".templ", "text/html", function(err, data) {
+        ajax("themes/" + Prefs.theme.toLowerCase() + ".templ", "text/html", function(err, data) {
           if(err){
             setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme");
             Prefs.theme = "Default";
@@ -607,7 +607,7 @@
           reset.href = "themes/reset.css";
           document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
         }
-        stylesheet.href = "themes/" + Prefs.theme + ".css";
+        stylesheet.href = "themes/" + Prefs.theme.toLowerCase() + ".css";
         style.parentElement.removeChild(style); //remove Default's CSS
       }
     }

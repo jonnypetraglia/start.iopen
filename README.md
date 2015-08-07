@@ -4,10 +4,10 @@ start.iopen is an open-source clone of [start.io](http://start.io), a startpage
 for your favorite links.
 
 It's designed to be **open-source** and therefore **self-hostable**, work
-**locally*, and be so simply written in **vanilla JS** that it should run in
+**locally**, and be so simply written in **vanilla JS** that it should run in
 all modern browsers, and -most importantly- be essentially self-contained in
 **one HTML file** and your sites in **one JSON file**. And lastly: it's designed
-to load even when **despite internet failure**.
+to load even **despite internet failure**.
 
 
 ## Editing your sites ##
@@ -35,11 +35,12 @@ As stated, start.iopen is self-contained in one file. But there's also external
 skins that are *entirely optional*. A theme is just two files inside the
 'themes' directory:
 
-  (1) <theme-name>.css
-  (2) <theme-name>.templ
+  1. $THEME_NAME.css
+  2. $THEME_NAME.templ
 
 start.iopen uses [John Resig's Micro-Templating](http://ejohn.org/blog/javascript-micro-templating/)
 for templating so it's fast and simple.
+
 
 ## Ideal usage ##
 
@@ -60,6 +61,27 @@ Also network problems are annoying enough without seeing a loading icon every
 time you open a new tab.
 
 
+## Things lacking from start.io ##
+
+start.iopen does not have feature parity with start.io nor does it intend to.
+
+  - Colors: currently this is omitted to make the JSON more concise, but I plan
+    to implement it soon.
+  - Stats: things like "click/lastClicked/lastUpdated"; but really the goal is
+    to create a quick, fast starting page, not an avenue to datamine onesself.
+  - Updates: checking if a site has "updated" is better reserved to feed readers
+    and utilities that can handle sites that require authentication (i.e. gmail).
+  - Site Management: no more fancy GUI, "Trash", etc; a JSON file should be enough
+  - Bookmarklet: no "quick adds" to the JSON file
+  - Antiquated iPhone interface: just......yeah
+  - Requires JS: though the modern web is created with JS so really NBD
+
+
+
+********************************************************************************
+
+
+
 ## Local usage ##
 
 Using start.iopen locally is indeed possible, with some caveats depending on
@@ -77,17 +99,17 @@ in the same local directory.
 
 Thus there are two solutions:
 
-  #### 1. Find a browser-specific workaround
+#### 1. Find a browser-specific workaround
 
-  For Chrome, it would be launching it with the parameter
-  `--allow-file-access-from-files`, which admittedly does lessen security overall.
+For Chrome, it would be launching it with the parameter
+`--allow-file-access-from-files`, which admittedly does lessen security overall.
 
-  #### 2. Make the JSON "JSON-esque"
+#### 2. Make the JSON "JSON-esque"
 
-  Adding the line:
-    ```jsonData=```
-  to your sites JSON file will then let start.iopen read it as though it were JS,
-  making browsers like Chrome happy.
+Adding the line:
+  ```jsonData=```
+to your sites JSON file will then let start.iopen read it as though it were JS,
+making browsers like Chrome happy.
 
 ### Themes ###
 
@@ -125,19 +147,3 @@ And lastly, if you write a theme that you like, feel free to submit it to the
 [Github repo](http://github.com/notbryant/start.iopen) or create a
 [Gist](https://gist.github.com/) for it or just email me (address is in the
 commit log).
-
-
-## Things lacking from start.io ##
-
-start.iopen does not have feature parity with start.io nor does it intend to.
-
-  - Colors: currently this is omitted to make the JSON more concise, but I plan
-    to implement it soon.
-  - Stats: things like "click/lastClicked/lastUpdated"; but really the goal is
-    to create a quick, fast starting page, not an avenue to datamine onesself.
-  - Updates: checking if a site has "updated" is better reserved to feed readers
-    and utilities that can handle sites that require authentication (i.e. gmail).
-  - Site Management: no more fancy GUI, "Trash", etc; a JSON file should be enough
-  - Bookmarklet: no "quick adds" to the JSON file
-  - Antiquated iPhone interface: just......yeah
-  - Requires JS: though the modern web is created with JS so really NBD
