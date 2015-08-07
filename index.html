@@ -2,6 +2,8 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+  <meta content='width=device-width' name='viewport'>
   <title>start.iopen</title>
   <link rel="shortcut icon" href="favicon.ico?v=1.0" type="image/x-icon" id="startiopen_favicon" />
   <link rel="stylesheet" type="text/css" id="startiopen_stylesheet">
@@ -33,12 +35,13 @@
       padding: 0.5em 1em;
       color: white;
       cursor: pointer;
+      margin-right: 1em;
     }
     .dialog button:hover:not(.nostyle) {
       background: #5d90a8;
     }
     .dialog h1 {
-      font: normal 4em sans-serif;
+      font: normal 3.5em sans-serif;
       margin: 0;
     }
     #startiopen_about span {
@@ -98,7 +101,7 @@
       user-select: none;
       cursor: default;
     }
-    .menu > div:hover ul,
+    .menu.hover-show > div:hover ul,
     .menu input[type=checkbox]:checked ~ ul {
       display: block;
     }
@@ -174,19 +177,59 @@
       text-shadow: -1px -1px #444;
     }
   </style>
+  <style id="startiopen_mobileStyle" disabled=disabled>
+    html, body, main {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    main {
+     font-family: verdana, sans-serif;
+     font-size: 1.4em;
+     line-height: 1.8em;
+     text-align: center;
+    }
+    main a, main a:visited {
+     color: black;
+     text-decoration: none;
+     display: block;
+    }
+    main h2 {
+      font-size: 1.6em;
+      margin: 0 0 0.25em 0;
+      font-weight:500;
+      border-bottom: DarkGray 1px solid;
+      display: inline-block;
+    }
+    main .group {
+      padding: 2em 0 1em 0;
+    }
+    .menu {
+      width: 100%;
+      left: 0;
+      position: relative;
+      font-size: 1.5em;
+    }
+    .menu.hover-show > div:hover ul {
+      display: inherit !important;
+    }
+    #startiopen_about {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <!-- The container that will hold the rendered favorites -->
-  <main id="startiopen_container"></main>
   <!-- "Nav" menu used to access preferences, fetch sites, etc -->
-  <nav id="startiopen_nav" class="menu">
+  <nav id="startiopen_nav" class="menu hover-show">
     <div>
       <!-- At one time I made the menu toggleable instead of activated by hover -->
       <input type="checkbox" id="startio_menucbox" disabled style="display: none;">
       <script type="text/javascript">
         document.getElementById("startio_menucbox").checked = false;
       </script>
-      <label for="menu-cbox" class="logo" id="startio_mainLogo">start.iopen</label>
+      <label for="startio_menucbox" class="logo" id="startio_mainLogo">start.iopen</label>
       <ul>
         <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
         <li onclick="showDialog('preferences')">Preferences</li>
@@ -196,13 +239,15 @@
       <span><i style="visibility: hidden">:)</i></span> <!-- Creates the small rounded bottom piece of the menu -->
     </div>
   </nav>
+  <!-- The container that will hold the rendered favorites -->
+  <main id="startiopen_container"></main>
   <!-- The screen that is used to set preferences -->
   <div id="startiopen_preferences" class="dialog" style="display: none;">
     <h1>Preferences</h1>
     <form onsubmit="savePrefs(); return false;" autocomplete="off">
       <p>
         <label for="jsonPath">Sites JSON path:
-          <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
+          <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 30em; max-width: 100%;"> 
         </label>
       </p>
       <p>
@@ -256,7 +301,11 @@
   <!-- The screen that displays info about the app -->
   <div id="startiopen_about" class="dialog" style="display: none;">
     <div>
-      <div class="logo" style="font-size: 3.14em">start.iopen</div>
+      <div class="logo" style="font-size: 3.14em">
+        <b style="text-align: center">
+          start.iopen
+        </b>
+      </div>
       <span style="margin-top: 1.3em">
         Version
         <script type="text/javascript">document.write(document.getElementById("startiopen_favicon").href.split("?")[1].substr(2))</script>
@@ -278,9 +327,9 @@
         ツ
       </small></span>
       <br/><br/>
-      <small style="width: 100%; text-align: right; display: inline-block; margin: 1em">
-        <button onclick="history.back(); return false">Done</button>
-      </small>
+      <b style="width: 100%; text-align: right; display: inline-block;">
+        <button onclick="history.back(); return false" style="margin: 1em">Done</button>
+      </b>
     </div>
   </div>
 
@@ -317,7 +366,7 @@
       <div class="group" id="<%=groupName%>">
         <h2><a href="#<%=groupName%>" target="_self"><%=groupName%></a></h2>
         <% for ( var linkName in links ) { %>
-          <a href="<%=links[linkName]%>"><%=linkName%></a><br />
+          <a href="<%=links[linkName]%>"><%=linkName%></a>
         <% } %>
       </div>
     <% } %>
@@ -333,6 +382,7 @@
     var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
     var themesReset = ["Edition", "Errand"]; // These themes require a CSS reset
 
+    document.getElementById("startiopen_mobileStyle").disabled = true;
 
     // Stores the current preference values
     var Prefs = {
@@ -578,7 +628,30 @@
       themeselector.appendChild(themeOpt);
     });
 
+
+    // Load the CSS
+    var style = document.getElementById("startiopen_defaultStyle");
+    if(isMobile()) {
+      document.getElementById("startiopen_mobileStyle").disabled = ''
+      document.getElementById("startio_menucbox").disabled = ''
+      Nav.className = 'menu'
+      Prefs.theme = "Mobile";
+      style.disabled = true;
+    } else {
+      if(Prefs.theme!="Default") {
+        var stylesheet = document.getElementById("startiopen_stylesheet");
+        if(themesReset.indexOf(Prefs.theme)>0) {
+          var reset = stylesheet.cloneNode();
+          reset.href = "themes/reset.css";
+          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+        }
+        stylesheet.href = "themes/" + Prefs.theme.toLowerCase() + ".css";
+        style.disabled = true;
+        //style.parentElement.removeChild(style); //remove Default's CSS
+      }
+    }
     // Fetch the theme and then fetch the sites
+    console.log(Prefs.theme)
     if(document.getElementById("startiopen_templ_" + Prefs.theme))
       fetchSites();
     else
@@ -594,23 +667,6 @@
             fetchSites();
           }
         });
-    // Load the CSS
-    var style = document.getElementById("startiopen_defaultStyle");
-    if(isMobile()) {
-      style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
-      Prefs.theme = "Mobile";
-    } else {
-      if(Prefs.theme!="Default") {
-        var stylesheet = document.getElementById("startiopen_stylesheet");
-        if(themesReset.indexOf(Prefs.theme)>0) {
-          var reset = stylesheet.cloneNode();
-          reset.href = "themes/reset.css";
-          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
-        }
-        stylesheet.href = "themes/" + Prefs.theme.toLowerCase() + ".css";
-        style.parentElement.removeChild(style); //remove Default's CSS
-      }
-    }
   </script>
 
 </body>
