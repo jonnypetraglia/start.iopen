@@ -382,12 +382,15 @@
             if(xobj.status == "200")
               callback(null, xobj.responseText);
             else
-              throw null;
+              fail();
           }
         };
         xobj.send(null);
       } catch(e) {
-        callback(xobj.status == "0" ? "CORS request not allowed" : "AJAX failed: " + xobj.status + " " + xobj.statusText);
+        fail();
+      }
+      function fail() {
+        callback(xobj.status === 0 ? "CORS request not allowed" : "AJAX failed: " + xobj.status + " " + xobj.statusText);
       }
     };
 
@@ -550,21 +553,18 @@
     if(document.getElementById("startiopen_templ_" + Prefs.theme))
       fetchSites();
     else
-      try {
         ajax("themes/" + Prefs.theme + ".templ", "text/html", function(err, data) {
-          if(err)
-            throw err;
-          var template = document.getElementById("startiopen_templ_Default");
-          template.innerHTML = data;
-          template.id = "startiopen_templ_" + Prefs.theme
-          fetchSites();
+          if(err){
+            setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme");
+            Prefs.theme = "Default";
+            fetchSites();
+          } else {
+            var template = document.getElementById("startiopen_templ_Default");
+            template.innerHTML = data;
+            template.id = "startiopen_templ_" + Prefs.theme
+            fetchSites();
+          }
         });
-      } catch(e) {
-        setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme")
-        Prefs.theme = "Default";
-        fetchSites();
-      }
-
     // Load the CSS
     var style = document.getElementById("startiopen_defaultStyle");
     if(isMobile()) {
