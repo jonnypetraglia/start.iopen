@@ -401,7 +401,7 @@
     document.getElementById("startiopen_forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
     document.getElementById("startiopen_forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
     document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
-    document.getElementById("startiopen_jsonIsh").value = Prefs.jsonIsh;
+    document.getElementById("startiopen_jsonIsh").checked = Prefs.jsonIsh;
     if(Prefs.auth) {
       var auth = atob(Prefs.auth);
       document.getElementById("startiopen_auth_user").value = auth.substr(0, auth.indexOf(":"))
@@ -499,7 +499,7 @@
       localScript.type = "text/javascript";
       localScript.onload = function() {
         if(window.jsonData) {
-          localStorage.setItem("startiopen_sites", window.jsonData);
+          localStorage.setItem("startiopen_sites", JSON.stringify(window.jsonData));
           localStorage.setItem("startiopen_lastFetched", new Date().getTime());
           populateDOM(JSON.stringify(window.jsonData));
         } else {
@@ -525,6 +525,7 @@
       if(cacheData!=null && !force && !autofetch) {
         populateDOM(cacheData);
       } else {
+        console.log(Prefs.jsonIsh)
         if(Prefs.jsonIsh)
           loadJsonIsh();
         else
@@ -651,7 +652,6 @@
       }
     }
     // Fetch the theme and then fetch the sites
-    console.log(Prefs.theme)
     if(document.getElementById("startiopen_templ_" + Prefs.theme))
       fetchSites();
     else
