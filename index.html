@@ -5,6 +5,7 @@
   <title>start.iopen</title>
   <link rel="shortcut icon" href="favicon.ico?v=1.0" type="image/x-icon" id="startiopen_favicon" />
   <link rel="stylesheet" type="text/css" id="startiopen_stylesheet">
+  <!-- Default theme that is loaded as a fallback, if the user's choice isn't available, etc) -->
   <style id="startiopen_defaultStyle">
     body{background:#fff;font-family:Helvetica,Helvetica,Arial,sans-serif;margin:0}.theGroups{clear:both}.belowSpace{clear:both;height:20px}.theGroups .group{width:200px;margin:50px 0 0 90px;display:inline-block;float:left!important}.theGroups .group .title{width:185px;padding:0 0 6px 15px;border-bottom:1px solid #bcbcbc}.theGroups .group .title a{font-size:24px;text-decoration:none;color:#000}.theGroups .group .theLinks{line-height:16pt;font-size:13px;margin-top:5px;margin-left:2px;color:#000}.theGroups .group .theLinks .notUpdated{padding:2px 0 0 17px}.theGroups .group .theLinks .notUpdated a{text-decoration:none;color:#000}.theGroups .group .theLinks .notUpdated a:hover{text-decoration:underline}
   </style>
@@ -175,9 +176,12 @@
   </style>
 </head>
 <body>
+  <!-- The container that will hold the rendered favorites -->
   <main id="startiopen_container"></main>
-  <nav id="startiopen_nav" class="menu" onload="alert('hi'); this.checked = false">
+  <!-- "Nav" menu used to access preferences, fetch sites, etc -->
+  <nav id="startiopen_nav" class="menu">
     <div>
+      <!-- At one time I made the menu toggleable instead of activated by hover -->
       <input type="checkbox" id="startio_menucbox" disabled style="display: none;">
       <script type="text/javascript">
         document.getElementById("startio_menucbox").checked = false;
@@ -189,9 +193,10 @@
         <li onclick="showDialog(document.getElementById('startiopen_about'))">About</li>
         <li id="errorMenu" class="err" style="display:none">Error</li>
       </ul>
-      <span>&nbsp;</span>
+      <span><i style="visibility: hidden">:)</i></span> <!-- Creates the small rounded bottom piece of the menu -->
     </div>
   </nav>
+  <!-- The screen that is used to set preferences -->
   <div id="startiopen_preferences" class="dialog" style="display: none;">
     <h1>Preferences</h1>
     <form onsubmit="savePrefs(); return false;">
@@ -240,6 +245,7 @@
       <button class="nostyle" onclick="confirm('Clear cache?') && !localStorage.clear() && location.reload();">Clear cache</button>
     </p>
   </div>
+  <!-- The screen that displays info about the app -->
   <div id="startiopen_about" class="dialog" style="display: none;">
     <div>
       <div class="logo" style="font-size: 3.14em">start.iopen</div>
@@ -270,6 +276,7 @@
     </div>
   </div>
 
+  <!-- The default HTML template, used with the minified CSS at the top of the page -->
   <script type="text/html" id="startiopen_templ_Default">
     <div class="theGroups">
       <% for ( var groupName in groups ) { %>
@@ -295,6 +302,7 @@
     </div>
   </script>
 
+  <!-- The mobile template; the minified CSS at the top of the page also applies to this -->
   <script type="text/html" id="startiopen_templ_Mobile">
     <% for ( var groupName in groups ) { %>
       <% links = groups[groupName]; %>
@@ -307,15 +315,18 @@
     <% } %>
   </script>
 
+  <!-- What to display if there is an error or no sites exist -->
   <script type="text/html" id="startiopen_empty">
     <div class="empty"><%=message%></div>
   </script>
 
+  <!-- Everything to do with preferences -->
   <script type="text/javascript">
     var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
-    var themesReset = ["Edition", "Errand"];
+    var themesReset = ["Edition", "Errand"]; // These themes require a CSS reset
 
 
+    // Stores the current preference values
     var Prefs = {
       jsonPath: localStorage.getItem("startiopen_jsonPath") || "sites.json",
       theme: localStorage.getItem("startiopen_theme") || "Default",
@@ -324,6 +335,7 @@
       autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7),
       jsonIsh: localStorage.getItem("startiopen_jsonIsh") == "true"
     };
+    // Set the preference values in the DOM
     document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
     document.getElementById("startiopen_newWindow").checked = Prefs.newWindow;
     document.getElementById("startiopen_forceLayout_auto").checked = Prefs.forceLayout=="auto";
@@ -332,6 +344,7 @@
     document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
     document.getElementById("startiopen_jsonIsh").value = Prefs.jsonIsh;
 
+    // Persist the DOM's preference values to localStorage
     function savePrefs() {
       localStorage.setItem("startiopen_jsonPath", document.getElementById("startiopen_jsonPath").value)
       localStorage.setItem("startiopen_theme", document.getElementById("startiopen_theme").value)
@@ -348,6 +361,7 @@
     }
   </script>
 
+  <!-- The magic function that combines the template with the JSON data -->
   <script type="text/javascript">
     // Simple JavaScript Templating
     // John Resig - http://ejohn.org/ - MIT Licensed
@@ -356,9 +370,8 @@
   </script>
 
   <script type="text/javascript">
-    var Container = document.getElementById("startiopen_container"),
-        Nav = document.getElementById("startiopen_nav");
-    function load(file, mimetype, callback) {
+    // Perform an AJAX call
+    function ajax(file, mimetype, callback) {
       Container.innerHTML = "<div class='loading'></div>";
       var xobj = new XMLHttpRequest();
       xobj.overrideMimeType(mimetype);
@@ -373,38 +386,9 @@
       };
       xobj.send(null);
     };
-    function isMobile() {
-      if(Prefs.forceLayout == "mobile") return true;
-      if(Prefs.forceLayout == "desktop") return false;
-      try{ document.createEvent("TouchEvent"); return true; }
-      catch(e){ return false; }
-    }
-  </script>
 
-  <script type="text/javascript">
-    window.onhashchange = showGroup;
-    function showGroup() {
-      var groupName = location.hash.replace(/^#/, '');
-      var group = groupName.length ? document.getElementById(groupName) : null;
-      if(groupName.length && !group)
-        return setEmpty("No group named '" + groupName + "'");
-      var groupDivs = document.getElementsByClassName("group");
-      [].forEach.call(groupDivs, function(groupDiv) {
-        groupDiv.style.display = (group == groupDiv || group===null) ? "" : "none";
-      });
-    }
-
-    ///// Set up the Skin Selector /////
-    var themeselector = document.getElementById("startiopen_theme"); //document.createElement("select");
-    themes.forEach(function(theme) {
-      var themeOpt = document.createElement("option");
-      themeOpt.textContent = theme;
-      if(theme==Prefs.theme) themeOpt.selected = 'selected';
-      themeselector.appendChild(themeOpt);
-    });
-
-
-    var loadContents = function(jsonData) {
+    // Creates the HTML entities from the JSON and puts them into the DOM
+    var populateDOM = function(jsonData) {
       try {
         Container.innerHTML = tmpl("startiopen_templ_" + Prefs.theme, {groups: JSON.parse(jsonData)});
       } catch(e) {
@@ -428,6 +412,7 @@
       }
     };
 
+    // Loads the faux-JSON file that sets window.jsonData
     var loadJsonIsh = function(previousError) {
       var localScript = document.createElement("script");
       localScript.type = "text/javascript";
@@ -435,11 +420,11 @@
         if(window.jsonData) {
           localStorage.setItem("startiopen_sites", window.jsonData);
           localStorage.setItem("startiopen_lastFetched", new Date().getTime());
-          loadContents(JSON.stringify(window.jsonData));
+          populateDOM(JSON.stringify(window.jsonData));
         } else {
-          // load() has  thrown an error, now loadJsonIsh() failed
+          // ajax() has  thrown an error, now loadJsonIsh() failed
           setError(previousError ? "AJAX threw an error and JSON-ish did not set window.jsonData" : "JSON-ish file did not set window.jsonData", !localStorage.getItem("startiopen_sites"))
-          loadContents(cacheData);
+          populateDOM(cacheData);
         }
       };
       localScript.onerror = function(e) {
@@ -457,22 +442,22 @@
       var diffDays = Math.floor(timeDiff / (1000 * 3600 * 24));
       var autofetch = (diffDays >= Prefs.autoFetchDays);
       if(cacheData!=null && !force && !autofetch) {
-        loadContents(cacheData);
+        populateDOM(cacheData);
       } else {
         if(Prefs.jsonIsh)
           loadJsonIsh();
         else
           try {
-            load(Prefs.jsonPath, "application/json", function(err, jsonData) {
+            ajax(Prefs.jsonPath, "application/json", function(err, jsonData) {
               if(jsonData) {
                 localStorage.setItem("startiopen_sites", jsonData);
                 localStorage.setItem("startiopen_lastFetched", new Date().getTime());
-                loadContents(jsonData);
+                populateDOM(jsonData);
               } else {
                 //loadJsonIsh(e);
                 if(cacheData && cacheData.length>0) {
                   setError(err + "; Using cached data");
-                  loadContents(cacheData);
+                  populateDOM(cacheData);
                 } else
                   setError(err, true);  // No cached data exists
               }
@@ -485,81 +470,120 @@
       }
     };
 
-      if(document.getElementById("startiopen_templ_" + Prefs.theme))
-        fetchSites();
-      else
-        try {
-          load("themes/" + Prefs.theme + ".templ", "text/html", function(err, data) {
-            if(err)
-              throw err;
-            var template = document.getElementById("startiopen_templ_Default");
-            template.innerHTML = data;
-            template.id = "startiopen_templ_" + Prefs.theme
-            fetchSites();
-          });
-        } catch(e) {
-          setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme")
-          Prefs.theme = "Default";
-          fetchSites();
-        }
-
-      // Load CSS
-      var style = document.getElementById("startiopen_defaultStyle");
-      if(isMobile()) {
-        style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
-        Prefs.theme = "Mobile";
-      } else {
-        if(Prefs.theme!="Default") {
-          var stylesheet = document.getElementById("startiopen_stylesheet");
-          if(themesReset.indexOf(Prefs.theme)>0) {
-            var reset = stylesheet.cloneNode();
-            reset.href = "themes/reset.css";
-            document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
-          }
-          stylesheet.href = "themes/" + Prefs.theme + ".css";
-          style.parentElement.removeChild(style); //remove Default's CSS
-        }
-      }
-      
-      function setError(what, utterFailure) {
-        what = what || "Unknown failure";
-        document.getElementById("startio_mainLogo").className += " err";
-        var err = document.getElementById("errorMenu");
-        if(err.dataset.message) {
-          if(err.dataset.message.indexOf("\n")==-1)
-            err.textContent += "s"
-          err.dataset.message += "\n" + what;
-        } else
-          err.dataset.message = what;
-        err.style.color = "DarkRed";
-        err.title = err.dataset.message;
-        err.style.display = "";
-        err.onclick = function() {
-          alert(err.dataset.message);
-        };
-        if(utterFailure)
-          setEmpty(what);
-        console.error(what);
-      }
-      function setEmpty(msg) { Container.innerHTML = tmpl("startiopen_empty", {message: msg}); return msg;}
-
-      function showDialog(div) {
-        Container.style.display=Nav.style.display='none';
-        div.style.display='block';
-      }
-      function hideDialog(div) {
-        Nav.style.display = 'inline-block';
-        Container.style.display = '';
-        div.style.display = 'none';
-      }
-
-      document.onkeydown = function(evt) {
-          evt = evt || window.event;
-          if (evt.keyCode == 27)
-            // Hide ALL the dialogs!
-            [].forEach.call(document.getElementsByClassName('dialog'), hideDialog);
+    // Sets the main content to be an error
+    function setError(what, utterFailure) {
+      what = what || "Unknown failure";
+      document.getElementById("startio_mainLogo").className += " err";
+      var err = document.getElementById("errorMenu");
+      if(err.dataset.message) {
+        if(err.dataset.message.indexOf("\n")==-1)
+          err.textContent += "s"
+        err.dataset.message += "\n" + what;
+      } else
+        err.dataset.message = what;
+      err.style.color = "DarkRed";
+      err.title = err.dataset.message;
+      err.style.display = "";
+      err.onclick = function() {
+        alert(err.dataset.message);
       };
+      if(utterFailure)
+        setEmpty(what);
+      console.error(what);
+    }
 
+    // Sets the main content to be the empty message
+    function setEmpty(msg) { Container.innerHTML = tmpl("startiopen_empty", {message: msg}); return msg;}
+
+    // Checks both the preferences and really poor attempt at a simple guess
+    function isMobile() {
+      if(Prefs.forceLayout == "mobile") return true;
+      if(Prefs.forceLayout == "desktop") return false;
+      try{ document.createEvent("TouchEvent"); return true; }
+      catch(e){ return false; }
+    }
+
+    // Dialog functions
+    function showDialog(div) {
+      Container.style.display=Nav.style.display='none';
+      div.style.display='block';
+    }
+    function hideDialog(div) {
+      Nav.style.display = 'inline-block';
+      Container.style.display = '';
+      div.style.display = 'none';
+    }
+
+    // Show JUST a group specified by the URL hash
+    window.onhashchange = showGroup;
+    function showGroup() {
+      var groupName = location.hash.replace(/^#/, '');
+      var group = groupName.length ? document.getElementById(groupName) : null;
+      if(groupName.length && !group)
+        return setEmpty("No group named '" + groupName + "'");
+      var groupDivs = document.getElementsByClassName("group");
+      [].forEach.call(groupDivs, function(groupDiv) {
+        groupDiv.style.display = (group == groupDiv || group===null) ? "" : "none";
+      });
+    }
+
+    // Make Esc hide the dialogs
+    document.onkeydown = function(evt) {
+        evt = evt || window.event;
+        if (evt.keyCode == 27)
+          [].forEach.call(document.getElementsByClassName('dialog'), hideDialog);
+    };
+
+
+    ////////////// End of functions, start the actual execution //////////////
+    var Container = document.getElementById("startiopen_container"),
+        Nav = document.getElementById("startiopen_nav"),
+        themeselector = document.getElementById("startiopen_theme")
+
+    // Set up the Skin Selector
+    themes.forEach(function(theme) {
+      var themeOpt = document.createElement("option");
+      themeOpt.textContent = theme;
+      if(theme==Prefs.theme) themeOpt.selected = 'selected';
+      themeselector.appendChild(themeOpt);
+    });
+
+    // Fetch the theme and then fetch the sites
+    if(document.getElementById("startiopen_templ_" + Prefs.theme))
+      fetchSites();
+    else
+      try {
+        ajax("themes/" + Prefs.theme + ".templ", "text/html", function(err, data) {
+          if(err)
+            throw err;
+          var template = document.getElementById("startiopen_templ_Default");
+          template.innerHTML = data;
+          template.id = "startiopen_templ_" + Prefs.theme
+          fetchSites();
+        });
+      } catch(e) {
+        setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme")
+        Prefs.theme = "Default";
+        fetchSites();
+      }
+
+    // Load the CSS
+    var style = document.getElementById("startiopen_defaultStyle");
+    if(isMobile()) {
+      style.innerHTML = "body { font-family: verdana, sans-serif; font-size: 1.2em; line-height: 1.3em; text-align: center;} a:visited { color: black}";
+      Prefs.theme = "Mobile";
+    } else {
+      if(Prefs.theme!="Default") {
+        var stylesheet = document.getElementById("startiopen_stylesheet");
+        if(themesReset.indexOf(Prefs.theme)>0) {
+          var reset = stylesheet.cloneNode();
+          reset.href = "themes/reset.css";
+          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+        }
+        stylesheet.href = "themes/" + Prefs.theme + ".css";
+        style.parentElement.removeChild(style); //remove Default's CSS
+      }
+    }
   </script>
 
 </body>
