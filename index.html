@@ -199,7 +199,7 @@
   <!-- The screen that is used to set preferences -->
   <div id="startiopen_preferences" class="dialog" style="display: none;">
     <h1>Preferences</h1>
-    <form onsubmit="savePrefs(); return false;">
+    <form onsubmit="savePrefs(); return false;" autocomplete="off">
       <p>
         <label for="jsonPath">Sites JSON path:
           <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 35em"> 
@@ -236,9 +236,17 @@
         <input name="jsonIsh" id="startiopen_jsonIsh" type="checkbox">
         <label for="jsonIsh">"JSON" file is really JS that sets window.jsonData</label>
       </p>
+      <p>
+        <label for="auth">Basic Auth:</label>
+        <input name="auth" type="text" id="startiopen_auth_user" placeholder="user" title="user">
+        <input name="auth" type="password" id="startiopen_auth_pass" placeholder="pass" title="pass">
+        
+        <small style="color: DarkRed; font-size: 0.75em">Do not use sensitive info. This is not secure.</small>
+        <!-- It's stored in plaintext and -if jsonPath is http- sent in cleartext over. -->
+      </p>
       <br />
       <button>Save</a>
-      <button onclick="hideDialogs(); return false">Cancel</button>
+      <button onclick="history.back(); return false">Cancel</button>
     </form>
     <p>
       Debug:
@@ -271,7 +279,7 @@
       </small></span>
       <br/><br/>
       <small style="width: 100%; text-align: right; display: inline-block; margin: 1em">
-        <button onclick="hideDialogs(); return false">Done</button>
+        <button onclick="history.back(); return false">Done</button>
       </small>
     </div>
   </div>
@@ -333,7 +341,8 @@
       newWindow: localStorage.getItem("startiopen_newWindow") !== "false",
       forceLayout: localStorage.getItem("startiopen_forceLayout") || "auto",
       autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7),
-      jsonIsh: localStorage.getItem("startiopen_jsonIsh") == "true"
+      jsonIsh: localStorage.getItem("startiopen_jsonIsh") == "true",
+      auth: localStorage.getItem("startiopen_auth")
     };
     // Set the preference values in the DOM
     document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
@@ -343,6 +352,11 @@
     document.getElementById("startiopen_forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
     document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
     document.getElementById("startiopen_jsonIsh").value = Prefs.jsonIsh;
+    if(Prefs.auth) {
+      var auth = atob(Prefs.auth);
+      document.getElementById("startiopen_auth_user").value = auth.substr(0, auth.indexOf(":"))
+      document.getElementById("startiopen_auth_pass").value = auth.substr(auth.indexOf(":")+1)
+    }
 
     // Persist the DOM's preference values to localStorage
     function savePrefs() {
@@ -357,6 +371,12 @@
       localStorage.setItem("startiopen_forceLayout", force)
       localStorage.setItem("startiopen_autoFetchDays", document.getElementById("startiopen_autoFetchDays").value);
       localStorage.setItem("startiopen_jsonIsh", document.getElementById("startiopen_jsonIsh").checked);
+      var user = document.getElementById("startiopen_auth_user").value,
+          pass = document.getElementById("startiopen_auth_pass").value;
+      if(!user || !pass || user=="" || pass=="")
+        localStorage.removeItem("startiopen_auth");
+      else
+        localStorage.setItem("startiopen_auth", btoa(user+":"+pass))
       location.reload()
     }
   </script>
@@ -377,6 +397,10 @@
         var xobj = new XMLHttpRequest();
         xobj.overrideMimeType(mimetype);
         xobj.open('GET', file, true);
+        if(Prefs.auth) {
+          xobj.setRequestHeader("Authorization", "Basic " + Prefs.auth);
+          xobj.setRequestHeader("Accept", "*/*");
+        }
         xobj.onreadystatechange = function () {
           if (xobj.readyState == 4) {
             if(xobj.status == "200")
