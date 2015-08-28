@@ -28,7 +28,7 @@
     .dialog > * {
       text-align:left;
     }
-    .dialog button:not(.nostyle) {
+    .dialog .button {
       font-size: 0.75em;
       background: #75B4D2;
       border-radius: 1em;
@@ -37,7 +37,7 @@
       cursor: pointer;
       margin-right: 1em;
     }
-    .dialog button:hover:not(.nostyle) {
+    .dialog .button:hover {
       background: #5d90a8;
     }
     .dialog h1 {
@@ -283,12 +283,12 @@
         <!-- It's stored in plaintext and -if jsonPath is http- sent in cleartext over. -->
       </p>
       <br />
-      <button>Save</a>
-      <button onclick="history.back(); return false">Cancel</button>
+      <label class="button" onclick="this.form.onsubmit() && this.form.submit()">Save</label>
+      <label class="button" onclick="history.back(); return false">Cancel</label>
     </form>
     <p>
       Debug:
-      <button class="nostyle" onclick="confirm('Clear preferences & cache?') && !localStorage.clear() && location.reload();">Clear</button>
+      <button onclick="confirm('Clear preferences & cache?') && !localStorage.clear() && refresh();">Clear All</button>
     </p>
   </div>
   <!-- The screen that displays info about the app -->
@@ -321,7 +321,7 @@
       </small></span>
       <br/><br/>
       <b style="width: 100%; text-align: right; display: inline-block;">
-        <button onclick="history.back(); return false" style="margin: 1em">Done</button>
+        <label class="button" onclick="history.back(); return false" style="margin: 1em">Done</label>
       </b>
     </div>
   </div>
