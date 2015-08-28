@@ -535,6 +535,7 @@
         } else {
           // ajax() has  thrown an error, now loadJsonIsh() failed
           setError(previousError ? "AJAX threw an error and JSON-ish did not set window.jsonData" : "JSON-ish file did not set window.jsonData", !localStorage.getItem("startiopen_sites"))
+          var cacheData = localStorage.getItem("startiopen_sites");
           populateDOM(cacheData);
         }
       };
