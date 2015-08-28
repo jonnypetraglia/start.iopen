@@ -669,17 +669,24 @@
       Prefs.theme = "Mobile";
       style.disabled = true;
     } else {
-      if(Prefs.theme!="Default") {
-        var stylesheet = document.getElementById("startiopen_stylesheet");
-        if(themesReset.indexOf(Prefs.theme)>0) {
-          var reset = stylesheet.cloneNode();
-          reset.href = "themes/reset.css";
-          document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+      if(Prefs.theme!="Default")
+        if(document.getElementById("startiopen_style_"+Prefs.theme))
+          document.getElementById("startiopen_style_"+Prefs.theme).disabled = '';
+        else {
+          stylesheet = document.getElementById("startiopen_stylesheet");
+          if(themesReset.indexOf(Prefs.theme)>0) {
+            if(document.getElementById("startiopen_resetStyle"))
+              document.getElementById("startiopen_resetStyle").disabled = '';
+            else {
+              var reset = stylesheet.cloneNode();
+              reset.href = "themes/reset.css";
+              document.getElementsByTagName("head")[0].insertBefore(reset, stylesheet);
+            }
+          }
+          stylesheet.href = "themes/" + Prefs.theme.toLowerCase() + ".css";
+          style.disabled = true;
+          //style.parentElement.removeChild(style); //remove Default's CSS
         }
-        stylesheet.href = "themes/" + Prefs.theme.toLowerCase() + ".css";
-        style.disabled = true;
-        //style.parentElement.removeChild(style); //remove Default's CSS
-      }
     }
     // Fetch the theme and then fetch the sites
     var forceFetch = !!getURLParameter("jsonPath") || (!!Prefs.jsonPath

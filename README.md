@@ -3,11 +3,10 @@
 start.iopen is an open-source clone of [start.io](http://start.io), a startpage
 for your favorite links.
 
-It's designed to be **open-source** and therefore **self-hostable**, work
-**locally**, and be so simply written in **vanilla JS** that it should run in
+It's designed to be **open-source** and therefore **self-hostable**, be so simply written in **vanilla JS** that it should run in
 all modern browsers, and -most importantly- be essentially self-contained in
-**one HTML file** and your sites in **one JSON file**. And lastly: it's designed
-to load even **despite internet failure**.
+**one HTML file** and your sites in **one JSON file**. With some concessions,
+it's also designed to work **locally** and to load even **despite internet failure**.
 
 
 ## Editing your sites ##
@@ -28,6 +27,24 @@ Your sites are stored in a JSON file with the following format:
 
 That simple.
 
+## Preferences ##
+
+Preferences are stored in localStorage with the prefix 'startiopen_' (e.g. 'startiopen_jsonPath').
+
+  - jsonPath: the path to the JSON file
+  - theme: the name of the theme to use (`themes` variable contains a list of those available)
+  - newWindow: whether or not to make links open in a new window;
+  - forceLayout: force the layout to be either "desktop", "mobile", or "auto"
+  - autoFetchDays: how often to auto-fetch the sites; set to 0 to fetch on every load
+  - jsonIsh: jsonPath really points to a JavaScript file that sets window.jsonData to the data
+  - auth: HTTP Basic Auth string (base64 encoded) to use when making the AJAX requests
+
+These can be set via the interface in-browser or by URL parameters, like so:
+
+  ```index.html?theme=Precinct&jsonIsh=1&jsonPath=http%3A%2F%2Fmysite.com%2Ffavs.json&newWindow=false&forceLayout=mobile&autoFetchDays=3&auth=YXNkZjqe6WU%3D```
+
+Remember to URL encode values as needed, mostly jsonPath and auth.
+
 
 ## Themes & "One File" ##
 
@@ -47,83 +64,61 @@ for templating so it's fast and simple.
 The setup to start.iopen involves just hosting your JSON file somewhere. That's
 it.
 
-From there you can either host index.html (+themes if desired) or store them
-locally on your machine which will allow you to access your sites even when the
-internet is down. This is possible because start.iopen caches your sites using
-HTML localStorage so even if the internet is down, the page will load.
-
-Why load your list of favorites if the internet is down? Because it's the era of
-the web, of HTML5, of life within the browser and favorites are not just
-websites anymore.
-(Example: [FireSSH](https://addons.mozilla.org/EN-us/firefox/addon/firessh/))
-
-Also network problems are annoying enough without seeing a loading icon every
-time you open a new tab.
+From there you can either host index.html (+themes if desired), use the [Github pages](http://notbryant.github.io/start.iopen) hosted version, or store them
+locally on your machine (which admittedly has some complications, noted below).
 
 
 ## Things lacking from start.io ##
 
 start.iopen does not have feature parity with start.io nor does it intend to.
 
-  - Colors: currently this is omitted to make the JSON more concise, but I plan
-    to implement it soon.
-  - Stats: things like "click/lastClicked/lastUpdated"; but really the goal is
-    to create a quick, fast starting page, not an avenue to datamine onesself.
+  - Colors: currently this is omitted to make the JSON more concise but may
+    happen in the future.
+  - Stats: things like "lastClicked/lastUpdated"; but really the goal is to
+    create a quick, simple starting page, not an avenue to datamine onesself.
   - Updates: checking if a site has "updated" is better reserved to feed readers
-    and utilities that can handle sites that require authentication (i.e. gmail).
+    and utilities that can handle sites that require authentication (e.g. gmail).
   - Site Management: no more fancy GUI, "Trash", etc; a JSON file should be enough
   - Bookmarklet: no "quick adds" to the JSON file
   - Antiquated iPhone interface: just......yeah
-  - Requires JS: though the modern web is created with JS so really NBD
+  - no JS: start.iopen requires Javascript
 
 
 
 ********************************************************************************
 
-
+# Advanced Usage #
 
 ## Local usage ##
 
-Using start.iopen locally is indeed possible, with some caveats depending on
-the browser you use. Because browser security is ever tightening, some browsers
-are more strict for local files.
+Using start.iopen locally is indeed possible, but with one major hickup:
+browsers are strict when it comes to CORS (Cross Origin Resource Sharing).
+Even Ajax GET requests are cross-origin when being made from 'file://'.
 
-For example, Chrome will not let a local file interact with any other local
-files via AJAX, which is how start.iopen fetches the JSON.
+When your JSON file is also local, the amount of hassle this provides depends on
+what browser you use. For example, Firefox works flawlessly if index.html and
+the JSON file are in the same directory, Chrome does not. But all browsers have
+a problem if index.html is local and JSON is hosted.
 
-Meanwhile, Firefox works flawlessly because they let files access other files
-in the same local directory.
-
-
-### JSON ###
-
-Thus there are two solutions:
-
-#### 1. Find a browser-specific workaround
-
-For Chrome, it would be launching it with the parameter
-`--allow-file-access-from-files`, which admittedly does lessen security overall.
-
-#### 2. Make the JSON "JSON-esque"
-
-Adding the line:
-  ```jsonData=```
-to your sites JSON file will then let start.iopen read it as though it were JS,
-making browsers like Chrome happy.
-
-### Themes ###
-
-For themes, the only real solution is to paste the contents of the theme(s) you
-want into `index.html` inside a `<script>` tag like so:
+For local themes, the only real solution is to paste the contents of the
+theme(s) you want into `index.html` inside a `<script>` tag (like Default and Mobile do) as well as the css insode a `style`.
 
 ```
 <script type="text/html" id="startiopen_templ_{{THEME_NAME}}">
   ... file contents ...
-</script
+</script>
+<style id="startiopen_resetStyle" disabled>
+  ... reset.css if you need it ...
+</style>
+<style id="startiopen_style_{{THEME_NAME}}" disabled>
+  ... css contents ...
+</style>
 ```
 
-There are already two templates for "Default" and "Mobile" that work along this
-practice.
+The JSON file has two different solutions. If it's hosted online and you are
+able, you can set the CORS headers and make sure the OPTIONS HTTP method is
+supported on your web host. If you can't or don't want to, you can use the
+jsonIsh preference (which is basically JSONP that sets 'window.jsonData').
 
 
 ### Writing your own theme ###
@@ -139,7 +134,7 @@ Here are a few tips about writing your own theme:
     allow you to view just that group and even link to just it.
     (```<div class="group" id="<%=groupName%>">```)
   - Avoid using hardcoded ids. Mostly just so it won't interfere with the above.
-  - Make sure your styles stay contained inside `<main>`, otherwise things like
+  - Make sure your CSS stay contained inside `<main>`, otherwise things like
     the menu and preferences will look weird.
 
 
