@@ -231,7 +231,7 @@
       </script>
       <label for="startio_menucbox" class="logo" id="startio_mainLogo">start.iopen</label>
       <ul>
-        <li onclick="fetchSites(true) && location.reload()">Fetch Sites</li>
+        <li onclick="fetchSites(true) && refresh()">Fetch Sites</li>
         <li onclick="showDialog('preferences')">Preferences</li>
         <li onclick="showDialog('about')">About</li>
         <li id="errorMenu" class="err" style="display:none">Error</li>
@@ -244,7 +244,7 @@
   <!-- The screen that is used to set preferences -->
   <div id="startiopen_preferences" class="dialog" style="display: none;">
     <h1>Preferences</h1>
-    <form onsubmit="savePrefs(); return false;" autocomplete="off">
+    <form onsubmit="savePrefs(); refresh(); return false;" autocomplete="off">
       <p>
         <label for="jsonPath">Sites JSON path:
           <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 30em; max-width: 100%;"> 
@@ -259,19 +259,12 @@
         <select id="startiopen_theme" name="theme"></select>
       </p>
       <p>
-        Force layout:
-        <label>
-          <input type="radio" name="forceLayout" id="startiopen_forceLayout_auto" value="auto">
-          Auto-detect
-        </label>
-        <label>
-          <input type="radio" name="forceLayout" id="startiopen_forceLayout_desktop"value="desktop">
-          Desktop
-        </label>
-        <label>
-          <input type="radio" name="forceLayout" id="startiopen_forceLayout_mobile" value="mobile">
-          Mobile
-        </label>
+        <label for="forceLayout">Force layout</label>
+        <select id="startiopen_forceLayout" name="forceLayout">
+          <option>auto</option>
+          <option>desktop</option>
+          <option>mobile</option>
+        </select>
       </p>
       <p>
         <label for="autofetch">Auto-fetch every (days):</label>
@@ -377,57 +370,90 @@
     <div class="empty"><%=message%></div>
   </script>
 
-  <!-- Everything to do with preferences -->
   <script type="text/javascript">
+  <!-- Everything to do with preferences -->
     var themes = ["Default", "1957", "Edition", "Precinct", "Elizabeth", "Ribbons", "Errand", "Inky"];
     var themesReset = ["Edition", "Errand"]; // These themes require a CSS reset
-
     document.getElementById("startiopen_mobileStyle").disabled = true;
 
     // Stores the current preference values
-    var Prefs = {
-      jsonPath: localStorage.getItem("startiopen_jsonPath") || "sites.json",
-      theme: localStorage.getItem("startiopen_theme") || "Default",
-      newWindow: localStorage.getItem("startiopen_newWindow") !== "false",
-      forceLayout: localStorage.getItem("startiopen_forceLayout") || "auto",
-      autoFetchDays: parseInt(localStorage.getItem("startiopen_autoFetchDays") || 7),
-      jsonIsh: localStorage.getItem("startiopen_jsonIsh") == "true",
-      auth: localStorage.getItem("startiopen_auth")
+    var Prefs = {}, prefsAltered = false, PrefDefaults = {
+      jsonPath: "sites.json",
+      theme: themes,
+      newWindow: true,
+      forceLayout: ["auto", "desktop", "mobile"],
+      autoFetchDays: 7,
+      jsonIsh: false,
+      auth: function(a) {
+        if(!a.user || !a.pass || a.user=="" || a.pass=="")
+          return null;
+        return btoa(a.user+":"+a.pass);
+      }
     };
-    // Set the preference values in the DOM
-    document.getElementById("startiopen_jsonPath").value = Prefs.jsonPath;
-    document.getElementById("startiopen_newWindow").checked = Prefs.newWindow;
-    document.getElementById("startiopen_forceLayout_auto").checked = Prefs.forceLayout=="auto";
-    document.getElementById("startiopen_forceLayout_desktop").checked = Prefs.forceLayout=="desktop";
-    document.getElementById("startiopen_forceLayout_mobile").checked = Prefs.forceLayout=="mobile";
-    document.getElementById("startiopen_autoFetchDays").value = Prefs.autoFetchDays;
-    document.getElementById("startiopen_jsonIsh").checked = Prefs.jsonIsh;
-    if(Prefs.auth) {
-      var auth = atob(Prefs.auth);
-      document.getElementById("startiopen_auth_user").value = auth.substr(0, auth.indexOf(":"))
-      document.getElementById("startiopen_auth_pass").value = auth.substr(auth.indexOf(":")+1)
+    PrefDefaults.auth.user = function(auth) {if(!auth) return; auth=atob(auth); return auth.substr(0, auth.indexOf(":"))};
+    PrefDefaults.auth.pass = function(auth) {if(!auth) return; auth=atob(auth); return auth.substr(auth.indexOf(":")+1)};
+
+    // Load the preferences
+    for(var p in PrefDefaults) {
+      prefsAltered = prefsAltered || getURLParameter(p) != localStorage.getItem("startiopen_" + p);
+      Prefs[p] = getURLParameter(p) || localStorage.getItem("startiopen_" + p);
+
+      if(Prefs[p]===null || Prefs[p]===undefined || Prefs[p]=="") {
+        Prefs[p] = Array.isArray(PrefDefaults[p]) ? PrefDefaults[p][0]
+                   : typeof PrefDefaults[p] == "function" ? PrefDefaults[p]._ : PrefDefaults[p];
+      }
+      else if(typeof PrefDefaults[p] == "number")
+        Prefs[p] = parseInt(Prefs[p]);
+      else if(typeof PrefDefaults[p] == "boolean" && typeof Prefs[p] == "string")
+        Prefs[p] = Prefs[p] !== "false" && Prefs[p] !== "0";
+      else if(Array.isArray(PrefDefaults[p]))
+        Prefs[p] = PrefDefaults[p][ (PrefDefaults[p].indexOf(Prefs[p])+1||1)-1];
+
+      prefCtrlVal(p, Prefs[p]);
+    }
+
+    function prefCtrlVal(p, setval) {
+      var ctrl = document.getElementById("startiopen_" + p);
+      if(!ctrl) {
+        var ret = {};
+        for(var v in PrefDefaults[p]) {
+          var sub = Array.isArray(PrefDefaults[p]) ? PrefDefaults[p][v] : v;
+          if(typeof PrefDefaults[p][v] == "function")
+            ret[sub] = prefCtrlVal(p+"_"+sub, PrefDefaults[p][v](setval));
+          else if(prefCtrlVal(p+"_"+sub, setval))
+            ret = sub;
+        }
+        if(typeof PrefDefaults[p] == "function")
+          ret = PrefDefaults[p](ret);
+        return ret;
+      }
+      var attr = ctrl.type=="checkbox" ? "checked" : "value";
+
+      if(setval!==null && setval!==undefined)
+        if(p.indexOf("_")>-1) {
+          var main = p.split("_")[0], sub = p.split("_")[1];
+          if(attr=="checked")
+            ctrl[attr] = setval == sub;
+          else
+            ctrl[attr] = setval;
+        }
+        else
+          ctrl[attr] = setval;
+      return ctrl[attr];
     }
 
     // Persist the DOM's preference values to localStorage
     function savePrefs() {
-      localStorage.setItem("startiopen_jsonPath", document.getElementById("startiopen_jsonPath").value)
-      localStorage.setItem("startiopen_theme", document.getElementById("startiopen_theme").value)
-      localStorage.setItem("startiopen_newWindow", document.getElementById("startiopen_newWindow").checked)
-      var force = "auto";
-      if(document.getElementById("startiopen_forceLayout_desktop").checked)
-        force = "desktop"
-      else if(document.getElementById("startiopen_forceLayout_mobile").checked)
-        force = "mobile"
-      localStorage.setItem("startiopen_forceLayout", force)
-      localStorage.setItem("startiopen_autoFetchDays", document.getElementById("startiopen_autoFetchDays").value);
-      localStorage.setItem("startiopen_jsonIsh", document.getElementById("startiopen_jsonIsh").checked);
-      var user = document.getElementById("startiopen_auth_user").value,
-          pass = document.getElementById("startiopen_auth_pass").value;
-      if(!user || !pass || user=="" || pass=="")
-        localStorage.removeItem("startiopen_auth");
-      else
-        localStorage.setItem("startiopen_auth", btoa(user+":"+pass))
-      location.reload()
+      for(var p in PrefDefaults)
+        localStorage.setItem("startiopen_"+p, prefCtrlVal(p));
+    }
+
+    if(prefsAltered && !!getURLParameter("save"))
+      savePrefs();
+
+    // http://stackoverflow.com/a/8764051
+    function getURLParameter(name) {
+      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)', 'i').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
     }
   </script>
 
@@ -440,6 +466,9 @@
   </script>
 
   <script type="text/javascript">
+    function refresh() {
+      location.replace(location.pathname);
+    }
     // Perform an AJAX call
     function ajax(file, mimetype, callback) {
       Container.innerHTML = "<div class='loading'></div>";
@@ -525,7 +554,6 @@
       if(cacheData!=null && !force && !autofetch) {
         populateDOM(cacheData);
       } else {
-        console.log(Prefs.jsonIsh)
         if(Prefs.jsonIsh)
           loadJsonIsh();
         else
@@ -652,19 +680,22 @@
       }
     }
     // Fetch the theme and then fetch the sites
+    var forceFetch = !!getURLParameter("jsonPath") || (!!Prefs.jsonPath
+                    && !!localStorage.getItem("startiopen_jsonPath")
+                    && Prefs.jsonPath != localStorage.getItem("startiopen_jsonPath"));
     if(document.getElementById("startiopen_templ_" + Prefs.theme))
-      fetchSites();
+      fetchSites(forceFetch);
     else
         ajax("themes/" + Prefs.theme.toLowerCase() + ".templ", "text/html", function(err, data) {
           if(err){
             setError("AJAX failed to fetch your theme (" + Prefs.theme + ") for whatever reason; resorting to Default theme");
             Prefs.theme = "Default";
-            fetchSites();
+            fetchSites(forceFetch);
           } else {
             var template = document.getElementById("startiopen_templ_Default");
             template.innerHTML = data;
             template.id = "startiopen_templ_" + Prefs.theme
-            fetchSites();
+            fetchSites(forceFetch);
           }
         });
   </script>
