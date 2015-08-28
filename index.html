@@ -288,6 +288,7 @@
     </form>
     <p>
       Debug:
+      <button onclick="confirm('Clear cache?') && !localStorage.removeItem('startiopen_sites') && refresh();">Clear Cache</button>
       <button onclick="confirm('Clear preferences & cache?') && !localStorage.clear() && refresh();">Clear All</button>
     </p>
   </div>
