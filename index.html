@@ -244,7 +244,7 @@
   <!-- The screen that is used to set preferences -->
   <div id="startiopen_preferences" class="dialog" style="display: none;">
     <h1>Preferences</h1>
-    <form onsubmit="savePrefs(); refresh(); return false;" autocomplete="off">
+    <form id="startiopen_preferences_form" onsubmit="savePrefs(); refresh(); return false;" autocomplete="off">
       <p>
         <label for="jsonPath">Sites JSON path:
           <input name="jsonPath" id="startiopen_jsonPath" type="text" style="width: 30em; max-width: 100%;"> 
@@ -283,7 +283,7 @@
         <!-- It's stored in plaintext and -if jsonPath is http- sent in cleartext over. -->
       </p>
       <br />
-      <label class="button" onclick="this.form.onsubmit() && this.form.submit()">Save</label>
+      <label class="button" onclick="var form = document.getElementById('startiopen_preferences_form'); form.onsubmit() && form.submit()">Save</label>
       <label class="button" onclick="history.back(); return false">Cancel</label>
     </form>
     <p>
