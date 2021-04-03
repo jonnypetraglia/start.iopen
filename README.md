@@ -1,6 +1,6 @@
 # start.iopen #
 
-start.iopen is an open-source clone of [start.io](http://start.io), a startpage
+start.iopen is an open-source clone of the ([now defunct]((https://web.archive.org/web/20200909040015/http://start.io/))) [start.io](http://start.io), a startpage
 for your favorite links.
 
 It's designed to be **open-source** and therefore **self-hostable**, be so simply written in **vanilla JS** that it should run in
